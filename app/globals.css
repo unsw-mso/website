@@ -1,26 +1,115 @@
 @import "tailwindcss";
 
+/* Teach Tailwind about our theme attribute so `dark:` style variants work.
+   Usage: <div className="light:text-black"> */
+@custom-variant light (&:where([data-theme="light"], [data-theme="light"] *));
+
+/* ============================================================
+   RAW TOKENS — plain CSS vars. These are what actually swap.
+   ============================================================ */
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --primary:       #FF6B00;
+  --primary-dark:  #CC5500;
+  --primary-light: #FF8B33;
+  --orange-tint:   rgba(255, 107, 0, 0.12);
+  --orange-glow:   rgba(255, 107, 0, 0.35);
+
+  --ease-bounce: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --ease-soft:   cubic-bezier(0.22, 1, 0.36, 1);
 }
 
+:root,
+[data-theme='dark'] {
+  --bg:          #0A0A0A;
+  --surface:     #141414;
+  --surface-2:   #1C1C1C;
+  --text:        #F5F0E8;
+  --text-60:     rgba(245, 240, 232, 0.60);
+  --text-muted:  rgba(245, 240, 232, 0.45);
+  --line:        rgba(245, 240, 232, 0.08);
+  --shadow-soft: 0 24px 60px rgba(0, 0, 0, 0.55);
+}
+
+[data-theme='light'] {
+  --bg:          #F5F0E8;
+  --surface:     #FFFFFF;
+  --surface-2:   #EDE6D9;
+  --text:        #0A0A0A;
+  --text-60:     rgba(10, 10, 10, 0.60);
+  --text-muted:  rgba(10, 10, 10, 0.45);
+  --line:        rgba(10, 10, 10, 0.08);
+  --shadow-soft: 0 24px 60px rgba(120, 100, 70, 0.18);
+}
+
+/* ============================================================
+   TAILWIND THEME — generates the utility classes.
+   `inline` is ESSENTIAL here: it makes `bg-bg` compile to
+   `background-color: var(--bg)` rather than baking in #0A0A0A
+   at build time. Without it, theme switching silently does nothing.
+   ============================================================ */
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --color-bg:          var(--bg);
+  --color-surface:     var(--surface);
+  --color-surface-2:   var(--surface-2);
+  --color-text:        var(--text);
+  --color-text-60:     var(--text-60);
+  --color-text-muted:  var(--text-muted);
+  --color-line:        var(--line);
+
+  --color-primary:       var(--primary);
+  --color-primary-dark:  var(--primary-dark);
+  --color-primary-light: var(--primary-light);
+  --color-orange-tint:   var(--orange-tint);
+
+  --font-heading: var(--font-space-grotesk), sans-serif;
+  --font-body:    var(--font-inter), sans-serif;
+
+  --radius-sm:   12px;
+  --radius-md:   20px;
+  --radius-lg:   32px;
+  --radius-xl:   48px;
+  --radius-pill: 999px;
+
+  --ease-bounce: var(--ease-bounce);
+  --ease-soft:   var(--ease-soft);
+
+  --shadow-soft: var(--shadow-soft);
+  --shadow-glow: 0 0 48px var(--orange-glow);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+/* ============================================================
+   BASE
+   ============================================================ */
+@layer base {
+  html {
+    scroll-behavior: auto;   /* Lenis owns scrolling */
   }
-}
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  body {
+    background: var(--bg);
+    color: var(--text);
+    transition: background-color 0.5s var(--ease-soft),
+                color            0.5s var(--ease-soft);
+    overscroll-behavior-y: none;
+  }
+
+  /* Hide the native cursor only where a real pointer exists */
+  @media (hover: hover) and (pointer: fine) {
+    body,
+    body * {
+      cursor: none !important;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+      animation-duration: 0.01ms !important;
+      transition-duration: 0.01ms !important;
+    }
+  }
+
+  ::selection {
+    background: var(--primary);
+    color: #FFFFFF;
+  }
 }

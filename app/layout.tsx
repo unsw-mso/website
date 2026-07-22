@@ -4,9 +4,10 @@ import './globals.css'
 import 'lenis/dist/lenis.css'
 
 import LenisProvider from '@/providers/LenisProvider'
-import ThemeProvider from '@/providers/ThemeProvider'
 import CustomCursor from '@/components/ui/CustomCursor'
 import ThemeFlap from '@/components/ui/ThemeFlap'
+import Navbar from '@/components/layout/Navbar'
+import Footer from '@/components/layout/Footer'
 
 const spaceGrotesk = Space_Grotesk({
   subsets: ['latin'],
@@ -54,13 +55,13 @@ export default function RootLayout({
         <script dangerouslySetInnerHTML={{ __html: noFlashScript }} />
       </head>
       <body className="font-body antialiased">
-        <ThemeProvider>
           <LenisProvider>
             <CustomCursor />
+            <Navbar />
             {children}
+            <Footer />
             <ThemeFlap />
           </LenisProvider>
-        </ThemeProvider>
       </body>
     </html>
   )

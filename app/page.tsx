@@ -1,22 +1,42 @@
-export default function Home() {
+import HeroSection from '@/components/sections/HeroSection'
+import HeroSplash from '@/components/sections/HeroSplash'
+import MarqueeStrip from '@/components/ui/MarqueeStrip'
+import AboutSnapshot from '@/components/sections/AboutSnapshot'
+import TigerFall from '@/components/sections/TigerFall'
+import EventsPreview from '@/components/sections/EventsPreview'
+import SponsorsStrip from '@/components/sections/SponsorsStrip'
+import CTASection from '@/components/sections/CTASection'
+
+const MARQUEE = ['MSO', 'Malaysia', 'UNSW', 'Community', 'Together']
+
+export default function HomePage() {
   return (
-    <main className="flex min-h-[250vh] flex-col items-center justify-start gap-8 p-24">
-      <h1 className="font-heading text-6xl font-bold uppercase tracking-tight">
-        Session 1 live
-      </h1>
-      <p data-cursor="text" className="max-w-md text-text-60">
-        Hover me — the blob should become a caret. Scroll — it should glide.
-        Click the corner flap — everything should crossfade.
-      </p>
-      <button
-        data-cursor="hover"
-        className="rounded-pill bg-primary px-8 py-4 font-heading text-sm
-                   font-bold uppercase tracking-widest text-white
-                   transition-transform duration-300 ease-bounce hover:scale-105"
-      >
-        Hover me
-      </button>
-      <div className="mt-40 h-[80vh] w-full rounded-lg bg-surface shadow-soft" />
+    <main>
+      {/* The id is the anchor HeroSplash watches to know when to mount */}
+      <div id="hero">
+        <HeroSection />
+      </div>
+      <HeroSplash targetId="hero" />
+
+      <MarqueeStrip
+        className="bg-primary py-5"
+        speed={20}
+        items={MARQUEE.map((word) => (
+          <span
+            key={word}
+            className="px-5 font-heading text-[clamp(24px,3.5vw,34px)]
+                       font-bold uppercase italic tracking-wide text-white"
+          >
+            {word} ·
+          </span>
+        ))}
+      />
+
+      <AboutSnapshot />
+      <TigerFall />
+      <EventsPreview />
+      <SponsorsStrip />
+      <CTASection />
     </main>
   )
 }

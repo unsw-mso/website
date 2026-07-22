@@ -1,6 +1,6 @@
 'use client'
 
-import { useTheme } from '@/providers/ThemeProvider'
+import { useTheme } from '@/lib/use-theme'
 
 export default function ThemeFlap() {
   const { theme, toggle } = useTheme()

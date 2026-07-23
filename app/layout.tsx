@@ -24,8 +24,25 @@ const inter = Inter({
 })
 
 export const metadata: Metadata = {
-  title: 'UNSW MSO — Malaysian Students Organisation',
-  description: "Malaysia's home at UNSW.",
+  title: {
+    default: 'UNSW MSO — Malaysian Students Organisation',
+    template: '%s · UNSW MSO',
+  },
+  description: 
+    "Malaysia's home at UNSW. Events, community and culture for Malaysian students in Sydney.",
+    
+  // Required for Open Graph images to resolve to absolute URLs
+  // !!! Swap unswmso.org for your real domain when you have it.
+  metadataBase: new URL('https://unswmso.org'),
+  openGraph: {
+    type: 'website',
+    locale: 'en_AU',
+    siteName: 'UNSW MSO',
+    title: 'UNSW MSO — Malaysian Students Organisation',
+    description: "Malaysia's home at UNSW.",
+    images: ['/images/committee.jpg'],
+  },
+  twitter: { card: 'summary_large_image' },
 }
 
 // Runs BEFORE first paint so a light-mode user never sees a black flash

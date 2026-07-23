@@ -1,6 +1,7 @@
 'use client'
 
 import { motion } from 'motion/react'
+import { usePathname } from 'next/navigation'
 
 /**
  * Runs on EVERY route change (unlike layout.tsx, which persists).
@@ -9,6 +10,14 @@ import { motion } from 'motion/react'
  * ends up feeling laggy. A clean 0.45s enter reads as intentional.
  */
 export default function Template({ children }: { children: React.ReactNode }) {
+  const pathname = usePathname()
+
+  // The /gallery route is a full-screen, opaque WebGL overlay that runs its
+  // OWN entry animation. Fading the whole page in via opacity would make that
+  // opaque background translucent mid-transition, letting the persistent
+  // Navbar/Footer bleed through. Skip the wrapper fade so it covers instantly.
+  if (pathname === '/gallery') return <>{children}</>
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 16 }}

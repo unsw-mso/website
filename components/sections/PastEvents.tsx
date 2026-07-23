@@ -2,12 +2,52 @@
 
 import { useRef } from 'react'
 import Image from 'next/image'
+import { useRouter } from 'next/navigation'
 import { gsap, useGSAP } from '@/lib/utils/gsap'
 import SectionLabel from '@/components/ui/SectionLabel'
 import { pastEvents } from '@/lib/data/events'
 
 export default function PastEvents() {
   const section = useRef<HTMLElement>(null)
+  const portal = useRef<HTMLDivElement>(null)
+  const router = useRouter()
+
+  /* Zoom-into-the-button transition. We drop a circular orange disc dead-centre
+     on the button, then scale it up until it swallows the whole viewport before
+     pushing the /gallery route. The gallery's own entry animation (sphere
+     scaling in from 1.6×) picks up where this leaves off, so the two reads as
+     one continuous dive into the archive. */
+  const enterGallery = (e: React.MouseEvent<HTMLButtonElement>) => {
+    const disc = portal.current
+    if (!disc) return router.push('/gallery')
+
+    const rect = e.currentTarget.getBoundingClientRect()
+    const cx = rect.left + rect.width / 2
+    const cy = rect.top + rect.height / 2
+    // radius needed to reach the farthest viewport corner from the button
+    const far = Math.hypot(
+      Math.max(cx, window.innerWidth - cx),
+      Math.max(cy, window.innerHeight - cy),
+    )
+    const size = far * 2
+
+    gsap.set(disc, {
+      display: 'block',
+      width: size,
+      height: size,
+      left: cx,
+      top: cy,
+      xPercent: -50,
+      yPercent: -50,
+      scale: 0,
+    })
+    gsap.to(disc, {
+      scale: 1,
+      duration: 0.75,
+      ease: 'power3.inOut',
+      onComplete: () => router.push('/gallery'),
+    })
+  }
 
   useGSAP(
     () => {
@@ -78,7 +118,33 @@ export default function PastEvents() {
             </div>
           ))}
         </div>
+
+        {/* Portal into the spherical archive */}
+        <div className="mt-16 flex flex-col items-center gap-5 text-center">
+          <p className="max-w-md text-[15px] leading-relaxed text-text-60">
+            Every past event, arranged on the inside of a sphere. Step inside and
+            drag your way around the archive.
+          </p>
+          <button
+            onClick={enterGallery}
+            data-cursor="hover"
+            className="group relative overflow-hidden rounded-pill bg-primary px-9 py-4
+                       font-heading text-[13px] font-bold uppercase tracking-widest
+                       text-white transition-transform duration-300 ease-bounce
+                       hover:scale-105 active:scale-95"
+          >
+            Enter the Archive →
+          </button>
+        </div>
       </div>
+
+      {/* Expanding disc used by the zoom-in transition (hidden until clicked) */}
+      <div
+        ref={portal}
+        aria-hidden
+        className="pointer-events-none fixed z-[1200] hidden rounded-full bg-primary"
+        style={{ display: 'none' }}
+      />
     </section>
   )
 }

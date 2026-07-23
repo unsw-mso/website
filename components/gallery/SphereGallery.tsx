@@ -14,8 +14,12 @@ import { galleryCards, type GalleryCard } from './galleryData'
    ──────────────────────────────────────────────────────────────────────── */
 const RADIUS = 10 // sphere radius (world units); camera sits at 0,0,0
 const COLS = 16 // cards around the full 360° band
-const ROWS: number = 8 // latitude bands
-const PHI_MAX = 1.16 // how far up/down the grid wraps (radians, ~66°)
+// We lay the cards out on the ORIGINAL full-sphere grid (curvier, more
+// circular) but only build the middle band: TOTAL_ROWS defines the curve,
+// SKIP_ROWS drops that many rows off the top AND bottom. 8 − 2 − 2 = 4 rows.
+const TOTAL_ROWS = 8
+const SKIP_ROWS = 2
+const PHI_MAX = 1.16 // latitude the full grid would span (radians, ~66°)
 const CARD_W = 3.05
 const CARD_H = 3.5
 const FOV = 66 // wider FOV = stronger fisheye toward the edges
@@ -24,19 +28,32 @@ const ROT_SENS = 0.0042 // radians of rotation per pixel dragged
 const EASE = 0.085 // lenis-style follow lag (lower = floatier)
 const FRICTION = 0.94 // momentum decay after release
 const DRIFT = 0.00035 // gentle idle auto-rotation
-const PITCH_CLAMP = 0.62 // max vertical tilt (radians)
+// The band is centred on the equator, so black sky sits above the top row and
+// a black floor below the bottom row. Clamp keeps you from tilting so far you
+// lose the band into that emptiness.
+const PITCH_UP = 0.4 // max tilt looking up
+const PITCH_DOWN = -0.4 // max tilt looking down (into the floor)
+
+/* Face art used for every card until a per-card `image` is set. Swap the file
+   at this path (e.g. drop in the tiger PNG) and every card updates. */
+const CARD_PLACEHOLDER = '/images/card-placeholder.png'
 
 /* ── Procedural card texture ─────────────────────────────────────────────
-   Draws a full phantom-style tile onto a canvas: brand + project name across
-   the top, a gradient "image" with a big title and an orbit glyph, then a
-   category + tag pills + year meta row. Black margins blend into the scene. */
-function drawCard(card: GalleryCard): HTMLCanvasElement {
-  const W = 900
-  const H = 1040
-  const canvas = document.createElement('canvas')
-  canvas.width = W
-  canvas.height = H
-  const ctx = canvas.getContext('2d')!
+   Draws a full phantom-style tile onto a canvas: brand + event date across the
+   top, an image (or gradient fallback) in the middle with a big title, then a
+   date + tag pills + year meta row. Black margins blend into the scene. The
+   image is drawn only once it has loaded; drawCardFace is re-run then. */
+const CARD_CANVAS_W = 900
+const CARD_CANVAS_H = 1040
+
+function drawCardFace(
+  ctx: CanvasRenderingContext2D,
+  card: GalleryCard,
+  img?: HTMLImageElement,
+) {
+  const W = CARD_CANVAS_W
+  const H = CARD_CANVAS_H
+  ctx.clearRect(0, 0, W, H)
 
   // Opaque background matching the scene so we avoid alpha-sorting artifacts
   ctx.fillStyle = '#0A0A0A'
@@ -44,25 +61,6 @@ function drawCard(card: GalleryCard): HTMLCanvasElement {
 
   const pad = 40
   const light = '#F5F0E8'
-
-  // ── top label row ──
-  ctx.textBaseline = 'alphabetic'
-  ctx.font = '600 26px "Space Grotesk", sans-serif'
-  ctx.fillStyle = card.brand === 'MSO' ? '#FF6B00' : 'rgba(245,240,232,0.85)'
-  ctx.textAlign = 'left'
-  ctx.fillText(card.brand.toUpperCase(), pad, 62)
-
-  ctx.font = '500 22px "Space Grotesk", sans-serif'
-  ctx.fillStyle = 'rgba(245,240,232,0.5)'
-  ctx.textAlign = 'right'
-  ctx.fillText(card.category, W - pad, 60)
-
-  // ── image area ──
-  const ix = pad
-  const iy = 92
-  const iw = W - pad * 2
-  const ih = iw // square
-  const r = 18
 
   const roundRect = (x: number, y: number, w: number, h: number, rad: number) => {
     ctx.beginPath()
@@ -74,50 +72,86 @@ function drawCard(card: GalleryCard): HTMLCanvasElement {
     ctx.closePath()
   }
 
+  // ── top label row (bigger, more legible) ──
+  ctx.textBaseline = 'alphabetic'
+  ctx.font = '700 34px "Space Grotesk", sans-serif'
+  ctx.fillStyle = card.brand === 'MSO' ? '#FF6B00' : 'rgba(245,240,232,0.9)'
+  ctx.textAlign = 'left'
+  ctx.fillText(card.brand.toUpperCase(), pad, 66)
+
+  ctx.font = '600 30px "Space Grotesk", sans-serif'
+  ctx.fillStyle = 'rgba(245,240,232,0.75)'
+  ctx.textAlign = 'right'
+  ctx.fillText(card.date.toUpperCase(), W - pad, 64)
+
+  // ── image area ──
+  const ix = pad
+  const iy = 100
+  const iw = W - pad * 2
+  const ih = iw // square
+  const r = 18
+
   ctx.save()
   roundRect(ix, iy, iw, ih, r)
   ctx.clip()
 
-  // diagonal gradient fill
-  const grad = ctx.createLinearGradient(ix, iy, ix + iw, iy + ih)
-  grad.addColorStop(0, card.colors[0])
-  grad.addColorStop(1, card.colors[1])
-  ctx.fillStyle = grad
-  ctx.fillRect(ix, iy, iw, ih)
+  if (img && img.complete && img.naturalWidth > 0) {
+    // cover-fit the image into the square face
+    const dar = iw / ih
+    const iar = img.naturalWidth / img.naturalHeight
+    let sw: number, sh: number, sx: number, sy: number
+    if (iar > dar) {
+      sh = img.naturalHeight
+      sw = sh * dar
+      sx = (img.naturalWidth - sw) / 2
+      sy = 0
+    } else {
+      sw = img.naturalWidth
+      sh = sw / dar
+      sx = 0
+      sy = (img.naturalHeight - sh) / 2
+    }
+    ctx.drawImage(img, sx, sy, sw, sh, ix, iy, iw, ih)
+  } else {
+    // gradient fallback face
+    const grad = ctx.createLinearGradient(ix, iy, ix + iw, iy + ih)
+    grad.addColorStop(0, card.colors[0])
+    grad.addColorStop(1, card.colors[1])
+    ctx.fillStyle = grad
+    ctx.fillRect(ix, iy, iw, ih)
 
-  // soft radial glow, top-right
-  const glow = ctx.createRadialGradient(
-    ix + iw * 0.72, iy + ih * 0.28, 20,
-    ix + iw * 0.72, iy + ih * 0.28, iw * 0.6,
-  )
-  glow.addColorStop(0, 'rgba(255,255,255,0.28)')
-  glow.addColorStop(1, 'rgba(255,255,255,0)')
-  ctx.fillStyle = glow
-  ctx.fillRect(ix, iy, iw, ih)
+    const glow = ctx.createRadialGradient(
+      ix + iw * 0.72, iy + ih * 0.28, 20,
+      ix + iw * 0.72, iy + ih * 0.28, iw * 0.6,
+    )
+    glow.addColorStop(0, 'rgba(255,255,255,0.28)')
+    glow.addColorStop(1, 'rgba(255,255,255,0)')
+    ctx.fillStyle = glow
+    ctx.fillRect(ix, iy, iw, ih)
 
-  // orbit glyph — a couple of thin accent rings, like the reference marks
-  ctx.strokeStyle = card.accent
-  ctx.globalAlpha = 0.55
-  ctx.lineWidth = 3
-  ctx.beginPath()
-  ctx.ellipse(ix + iw * 0.68, iy + ih * 0.34, iw * 0.22, iw * 0.1, -0.5, 0, Math.PI * 2)
-  ctx.stroke()
-  ctx.beginPath()
-  ctx.ellipse(ix + iw * 0.68, iy + ih * 0.34, iw * 0.1, iw * 0.22, -0.5, 0, Math.PI * 2)
-  ctx.stroke()
-  ctx.globalAlpha = 1
+    ctx.strokeStyle = card.accent
+    ctx.globalAlpha = 0.55
+    ctx.lineWidth = 3
+    ctx.beginPath()
+    ctx.ellipse(ix + iw * 0.68, iy + ih * 0.34, iw * 0.22, iw * 0.1, -0.5, 0, Math.PI * 2)
+    ctx.stroke()
+    ctx.beginPath()
+    ctx.ellipse(ix + iw * 0.68, iy + ih * 0.34, iw * 0.1, iw * 0.22, -0.5, 0, Math.PI * 2)
+    ctx.stroke()
+    ctx.globalAlpha = 1
+  }
 
-  // legibility scrim at bottom of image
-  const scrim = ctx.createLinearGradient(0, iy + ih * 0.5, 0, iy + ih)
+  // legibility scrim at the bottom so the title reads over any art
+  const scrim = ctx.createLinearGradient(0, iy + ih * 0.52, 0, iy + ih)
   scrim.addColorStop(0, 'rgba(0,0,0,0)')
-  scrim.addColorStop(1, 'rgba(0,0,0,0.72)')
+  scrim.addColorStop(1, 'rgba(0,0,0,0.82)')
   ctx.fillStyle = scrim
-  ctx.fillRect(ix, iy + ih * 0.5, iw, ih * 0.5)
+  ctx.fillRect(ix, iy + ih * 0.52, iw, ih * 0.48)
 
   // big title, wrapped, bottom-left
   ctx.textAlign = 'left'
   ctx.fillStyle = light
-  ctx.font = '700 72px "Space Grotesk", sans-serif'
+  ctx.font = '700 68px "Space Grotesk", sans-serif'
   const words = card.title.toUpperCase().split(' ')
   const lines: string[] = []
   let line = ''
@@ -131,7 +165,7 @@ function drawCard(card: GalleryCard): HTMLCanvasElement {
     }
   }
   lines.push(line)
-  const lineH = 74
+  const lineH = 70
   let ty = iy + ih - 40 - (lines.length - 1) * lineH
   for (const l of lines) {
     ctx.fillText(l, ix + 28, ty)
@@ -145,35 +179,33 @@ function drawCard(card: GalleryCard): HTMLCanvasElement {
   roundRect(ix + 0.5, iy + 0.5, iw - 1, ih - 1, r)
   ctx.stroke()
 
-  // ── meta row (category + tags + year) ──
-  const my = iy + ih + 46
-  ctx.font = '500 24px "Space Grotesk", sans-serif'
+  // ── meta row (date + tags + year), all bumped up in size ──
+  const my = iy + ih + 54
+  ctx.font = '600 30px "Space Grotesk", sans-serif'
   ctx.textAlign = 'left'
-  ctx.fillStyle = 'rgba(245,240,232,0.9)'
-  ctx.fillText(card.category, pad, my)
+  ctx.fillStyle = 'rgba(245,240,232,0.95)'
+  ctx.fillText(card.date.toUpperCase(), pad, my)
 
-  // tag pills after the category label
-  let px = pad + ctx.measureText(card.category).width + 22
-  ctx.font = '500 20px "Space Grotesk", sans-serif'
+  // tag pills after the date
+  let px = pad + ctx.measureText(card.date.toUpperCase()).width + 24
+  ctx.font = '500 26px "Space Grotesk", sans-serif'
   for (const tag of card.tags) {
     const tw = ctx.measureText(tag).width
-    const pw = tw + 28
-    ctx.strokeStyle = 'rgba(245,240,232,0.2)'
+    const pw = tw + 34
+    ctx.strokeStyle = 'rgba(245,240,232,0.24)'
     ctx.lineWidth = 1.5
-    roundRect(px, my - 26, pw, 38, 19)
+    roundRect(px, my - 34, pw, 48, 24)
     ctx.stroke()
-    ctx.fillStyle = 'rgba(245,240,232,0.7)'
-    ctx.fillText(tag, px + 14, my)
-    px += pw + 12
+    ctx.fillStyle = 'rgba(245,240,232,0.78)'
+    ctx.fillText(tag, px + 17, my)
+    px += pw + 14
   }
 
   // year, right-aligned
   ctx.textAlign = 'right'
-  ctx.font = '500 24px "Space Grotesk", sans-serif'
-  ctx.fillStyle = 'rgba(245,240,232,0.45)'
+  ctx.font = '500 30px "Space Grotesk", sans-serif'
+  ctx.fillStyle = 'rgba(245,240,232,0.5)'
   ctx.fillText(card.year, W - pad, my)
-
-  return canvas
 }
 
 interface Selected {
@@ -213,13 +245,33 @@ export default function SphereGallery() {
 
     const maxAniso = renderer.capabilities.getMaxAnisotropy()
 
-    // Build a texture per unique card, reused across tiles
+    // Build a texture per unique card, reused across tiles. Each starts with
+    // the gradient fallback drawn immediately, then swaps to the card image as
+    // soon as it loads (redraw + needsUpdate) so nothing pops in blank.
+    const loadedImages: HTMLImageElement[] = []
     const textures = galleryCards.map((card) => {
-      const tex = new THREE.CanvasTexture(drawCard(card))
+      const canvas = document.createElement('canvas')
+      canvas.width = CARD_CANVAS_W
+      canvas.height = CARD_CANVAS_H
+      const ctx = canvas.getContext('2d')!
+      drawCardFace(ctx, card)
+
+      const tex = new THREE.CanvasTexture(canvas)
       tex.colorSpace = THREE.SRGBColorSpace
       tex.anisotropy = maxAniso
       tex.minFilter = THREE.LinearMipmapLinearFilter
       tex.generateMipmaps = true
+
+      const src = card.image ?? CARD_PLACEHOLDER
+      if (src) {
+        const img = new Image()
+        loadedImages.push(img)
+        img.onload = () => {
+          drawCardFace(ctx, card, img)
+          tex.needsUpdate = true
+        }
+        img.src = src
+      }
       return tex
     })
 
@@ -228,11 +280,15 @@ export default function SphereGallery() {
 
     const geometry = new THREE.PlaneGeometry(CARD_W, CARD_H, 1, 1)
     const meshes: THREE.Mesh[] = []
-    const zAxis = new THREE.Vector3(0, 0, 1)
+    const worldUp = new THREE.Vector3(0, 1, 0)
+    const orient = new THREE.Matrix4()
+    const origin = new THREE.Vector3(0, 0, 0)
 
     let idx = 0
-    for (let row = 0; row < ROWS; row++) {
-      const phi = ROWS === 1 ? 0 : -PHI_MAX + (row / (ROWS - 1)) * (PHI_MAX * 2)
+    // Walk the ORIGINAL full-sphere grid but skip the top/bottom SKIP_ROWS so
+    // the surviving rows keep the wider, curvier spacing of the full sphere.
+    for (let row = SKIP_ROWS; row < TOTAL_ROWS - SKIP_ROWS; row++) {
+      const phi = -PHI_MAX + (row / (TOTAL_ROWS - 1)) * (PHI_MAX * 2)
       // brick-offset alternate rows a touch so the grid feels less rigid
       const rowOffset = (row % 2) * (Math.PI / COLS)
       for (let col = 0; col < COLS; col++) {
@@ -249,9 +305,11 @@ export default function SphereGallery() {
         const y = RADIUS * Math.sin(phi)
         const z = RADIUS * Math.cos(phi) * Math.cos(theta)
         mesh.position.set(x, y, z)
-        // face the centre (camera): +z normal points inward toward origin
-        const dir = mesh.position.clone().negate().normalize()
-        mesh.quaternion.setFromUnitVectors(zAxis, dir)
+        // Orient every card to face the centre with a fixed world up-vector.
+        // (setFromUnitVectors takes the shortest arc and rolls the card as you
+        // pass behind the camera; lookAt with an up keeps them all upright.)
+        orient.lookAt(origin, mesh.position, worldUp)
+        mesh.quaternion.setFromRotationMatrix(orient)
         mesh.userData = { card: cardData, baseScale: 1, hover: 0 }
         group.add(mesh)
         meshes.push(mesh)
@@ -270,11 +328,12 @@ export default function SphereGallery() {
     let frozen = false // true while a detail card is open
 
     const pointer = new THREE.Vector2(-2, -2)
+    const clickNDC = new THREE.Vector2()
     const raycaster = new THREE.Raycaster()
     let hovered: THREE.Mesh | null = null
 
     const clampPitch = () => {
-      target.x = Math.max(-PITCH_CLAMP, Math.min(PITCH_CLAMP, target.x))
+      target.x = Math.max(PITCH_DOWN, Math.min(PITCH_UP, target.x))
     }
 
     const onDown = (e: PointerEvent) => {
@@ -309,10 +368,20 @@ export default function SphereGallery() {
       try {
         renderer.domElement.releasePointerCapture(e.pointerId)
       } catch {}
-      // treat a near-still press+release as a click
+      // treat a near-still press+release as a click. Raycast fresh from THIS
+      // event's own coordinates rather than the render loop's `hovered` (which
+      // can be a frame stale) or the shared `pointer` (which only updates on
+      // pointermove — a synthetic click may skip that).
       const dist = Math.hypot(e.clientX - downAt.x, e.clientY - downAt.y)
-      if (dist < 6 && !frozen && hovered) {
-        openDetail(hovered)
+      if (dist < 6 && !frozen) {
+        const rect = renderer.domElement.getBoundingClientRect()
+        clickNDC.x = ((e.clientX - rect.left) / rect.width) * 2 - 1
+        clickNDC.y = -((e.clientY - rect.top) / rect.height) * 2 + 1
+        raycaster.setFromCamera(clickNDC, camera)
+        const hit = raycaster.intersectObjects(meshes, false)[0]?.object as
+          | THREE.Mesh
+          | undefined
+        if (hit) openDetail(hit)
       }
     }
 
@@ -335,10 +404,10 @@ export default function SphereGallery() {
       ;(mesh.material as THREE.Material).depthTest = false
       mesh.renderOrder = 999
 
-      // A point ~2.2 units in front of the camera, along the card's view dir
+      // A point ~2.4 units in front of the camera, along the card's view dir
       const front = mesh.position.clone().normalize().multiplyScalar(2.4)
       const faceCam = new THREE.Quaternion().setFromUnitVectors(
-        zAxis,
+        new THREE.Vector3(0, 0, 1),
         front.clone().negate().normalize(),
       )
 
@@ -480,6 +549,7 @@ export default function SphereGallery() {
       window.removeEventListener('resize', onResize)
       ro.disconnect()
       renderer.domElement.removeEventListener('pointerdown', onDown)
+      loadedImages.forEach((img) => (img.onload = null))
       geometry.dispose()
       meshes.forEach((m) => (m.material as THREE.Material).dispose())
       textures.forEach((t) => t.dispose())
@@ -576,7 +646,7 @@ function DetailPanel({ card, onClose }: { card: GalleryCard; onClose: () => void
           className="mb-6 inline-block rounded-pill border border-line px-4 py-1.5
                      font-heading text-[11px] uppercase tracking-widest text-text-60"
         >
-          {card.category} · {card.year}
+          {card.date} · {card.year}
         </div>
 
         <h1

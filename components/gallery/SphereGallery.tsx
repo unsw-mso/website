@@ -34,8 +34,10 @@ const DRIFT = 0.00035 // gentle idle auto-rotation
 const PITCH_UP = 0.4 // max tilt looking up
 const PITCH_DOWN = -0.4 // max tilt looking down (into the floor)
 
-/* Face art used for every card until a per-card `image` is set. Swap the file
-   at this path (e.g. drop in the tiger PNG) and every card updates. */
+/* Per-card art lives in this folder as <card-id>.png (e.g. merdeka-gala.png).
+   Any card without its own file falls back to CARD_PLACEHOLDER, then to the
+   gradient. Override a single card by setting its `image` in galleryData. */
+const CARD_IMAGE_DIR = '/images/cards'
 const CARD_PLACEHOLDER = '/images/card-placeholder.png'
 
 /* ── Procedural card texture ─────────────────────────────────────────────
@@ -262,16 +264,23 @@ export default function SphereGallery() {
       tex.minFilter = THREE.LinearMipmapLinearFilter
       tex.generateMipmaps = true
 
-      const src = card.image ?? CARD_PLACEHOLDER
-      if (src) {
-        const img = new Image()
-        loadedImages.push(img)
-        img.onload = () => {
-          drawCardFace(ctx, card, img)
-          tex.needsUpdate = true
-        }
-        img.src = src
+      // Per-card art: each card looks for its own file at /images/cards/<id>.png
+      // (override with an explicit `image`). If that's missing we fall back to
+      // the shared placeholder, and if THAT is missing the gradient stays.
+      const primary = card.image ?? `${CARD_IMAGE_DIR}/${card.id}.png`
+      const img = new Image()
+      loadedImages.push(img)
+      let triedFallback = false
+      img.onload = () => {
+        drawCardFace(ctx, card, img)
+        tex.needsUpdate = true
       }
+      img.onerror = () => {
+        if (triedFallback || primary === CARD_PLACEHOLDER) return
+        triedFallback = true
+        img.src = CARD_PLACEHOLDER // one retry with the shared placeholder
+      }
+      img.src = primary
       return tex
     })
 
@@ -566,7 +575,7 @@ export default function SphereGallery() {
       {/* top chrome — mimics the phantom HUD */}
       <div className="pointer-events-none absolute inset-x-0 top-0 z-10 flex items-start justify-between p-6 md:p-8">
         <div className="max-w-[280px] font-heading text-[11px] uppercase leading-relaxed tracking-[0.12em] text-text-60">
-          MSO ARCHIVE — A SPHERICAL RECORD OF EVERY NIGHT, GAME AND GATHERING.
+          MSO ARCHIVE — A RECORD OF RECENT EVENTS.
         </div>
         <button
           onClick={() => router.push('/events')}

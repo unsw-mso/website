@@ -30,7 +30,7 @@ export default function CommitteeGrid() {
   )
 
   // Skip 'Executive' — it has its own feature section above
-  const depts = DEPARTMENTS.filter((d) => d !== 'Executive')
+  const depts = DEPARTMENTS.filter((d) => d !== 'TopExecutive')
 
   return (
     <section ref={section} className="px-6 pb-40 md:px-12">

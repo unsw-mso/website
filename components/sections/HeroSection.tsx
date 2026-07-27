@@ -184,9 +184,8 @@ export default function HeroSection() {
       >
         <h2 className="font-heading text-[clamp(56px,10vw,112px)] font-bold
                        uppercase leading-none tracking-tight text-primary">
-          UNSW MSO
+          MSO
         </h2>
-        <p className="text-base text-text-60">Malaysia&apos;s home at UNSW</p>
       </div>
 
       {/* ---- Scroll cue ---- */}

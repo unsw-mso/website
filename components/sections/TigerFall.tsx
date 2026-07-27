@@ -61,15 +61,17 @@ export default function TigerFall() {
         <div className="self-center">
           <SectionLabel>The Mascot</SectionLabel>
           <SplitText
-            text="Meet your people."
+            text="Meet Harimeow."
             className="mt-6 font-heading text-[clamp(40px,5vw,76px)] font-bold
                        uppercase leading-[1.02] tracking-tight text-text"
           />
           <AnimatedText delay={0.15}>
             <p
-               className="mt-7 max-w-md text-lg leading-relaxed text-text-muted">
-              400+ members, one big family. Wherever you&apos;re from in
-              Malaysia — or beyond — there&apos;s a seat at our table.
+              className="mt-7 max-w-md text-lg leading-relaxed text-text-muted">
+              Our beloved mascot and the biggest cheerleader for the 
+              MSO family! Join 700+ members who make our community fun, welcoming,
+              and full of unforgettable memories. No matter where you&apos;re from, 
+              Harimeow and the team is ready to welcome you.
             </p>
           </AnimatedText>
         </div>

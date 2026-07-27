@@ -24,7 +24,7 @@ export default function BecomeSponsorCTA() {
         />
         <AnimatedText delay={0.15}>
           <p className="max-w-xl text-lg leading-relaxed text-text-60">
-            Put your brand in front of thousands of engaged students at one of
+            Put your brand in front of hundreds of engaged students at one of
             UNSW&apos;s largest cultural societies.
           </p>
         </AnimatedText>

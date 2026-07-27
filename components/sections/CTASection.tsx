@@ -32,7 +32,7 @@ export default function CTASection() {
         <AnimatedText delay={0.25}>
           <div className="mt-3 flex flex-wrap justify-center gap-5">
             <Link
-              href="/#join"
+              href="https://campus.hellorubric.com/?tab=memberships&s=8420"
               data-cursor="hover"
               /* active:scale-95 gives tactile press feedback; the bounce
                  easing on release is what sells the "squishy" feel */

@@ -30,9 +30,10 @@ export default function AboutSnapshot() {
         <div className="flex flex-col gap-6 pb-2">
           <AnimatedText delay={0.1}>
             <p className="text-lg leading-relaxed text-text">
-              MSO is home for every Malaysian at UNSW — and everyone who loves
-              Malaysia. From mamak nights to Merdeka celebrations, we keep the
-              flavours, festivals and friendships alive in Sydney.
+              MSO is home to everyone! Whether you&apos;re Malaysian or just a 
+              Malaysia lover here at UNSW, our social events, celebrations 
+              or weekly sports, is sure to keep the flavours, festivals, and 
+              friendships alive in Sydney.
             </p>
           </AnimatedText>
           <AnimatedText delay={0.2}>
@@ -49,7 +50,7 @@ export default function AboutSnapshot() {
                          text-[15px] font-bold uppercase tracking-widest
                          text-primary"
             >
-              Our Story
+              Our Team
               {/* Arrow slides right on hover with a bouncy ease */}
               <span className="transition-transform duration-300 ease-bounce
                                group-hover:translate-x-2">

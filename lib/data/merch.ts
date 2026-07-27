@@ -19,12 +19,12 @@ export function formatPrice(cents: number, currency = 'AUD') {
 }
 
 export const products: Product[] = [
-  { id: 'p1', name: 'Harimau Hoodie',  description: 'Heavyweight 400gsm fleece in jet black, tiger crest embroidered in orange. Designed by members, made for Sydney winters and Malaysian pride.', priceCents: 7900, currency: 'AUD', imageUrl: '', featured: true },
-  { id: 'p2', name: 'MSO Classic Tee', description: 'Soft cotton tee with the MSO wordmark.',        priceCents: 3900, currency: 'AUD', imageUrl: '', featured: false },
-  { id: 'p3', name: 'Kopitiam Tote',   description: 'Canvas tote for groceries, books and kaya.',    priceCents: 2500, currency: 'AUD', imageUrl: '', featured: false },
-  { id: 'p4', name: 'Tiger Cap',       description: 'Embroidered six-panel cap.',                    priceCents: 3200, currency: 'AUD', imageUrl: '', featured: false },
-  { id: 'p5', name: 'Merdeka Jersey',  description: 'Limited-run jersey in Merdeka colours.',        priceCents: 6500, currency: 'AUD', imageUrl: '', featured: false },
-  { id: 'p6', name: 'Sticker Pack',    description: 'Six vinyl stickers. Laptop, bottle, whatever.', priceCents: 800,  currency: 'AUD', imageUrl: '', featured: false },
+  { id: 'p1', name: 'Harimau Hoodie',  description: '2025 MSO Zipup made from 100% heavyweight cotton fleece featuring dropped shoulders and an oversized cut. Built for comfort, layered with attitude. Designed to sustain the noise between daily commutes.', priceCents: 4200, currency: 'AUD', imageUrl: '/images/merch/solo-hoodie.jpg', featured: true },
+  { id: 'p2', name: 'Oriental Jersey',   description: '2025 MSO Jersey made to be lightweight and sweat-wicking, where street grit meets Malaysian batik. Styled in motion, shot in transit. Made by athletes, for athletes.',    priceCents: 2100, currency: 'AUD', imageUrl: '/images/merch/jersey.jpg', featured: false },
+  { id: 'p3', name: 'Olive MSO Tee (COMING SOON !)', description: 'COMING SOON - Be Patient!',        priceCents: 0, currency: 'AUD', imageUrl: '/images/merch/shirtback-26.png', featured: false },
+  { id: 'p4', name: 'Guess Who? Sweater (COMING SOON !)', description: 'COMING SOON - Be Patient!',        priceCents: 0, currency: 'AUD', imageUrl: '/images/merch/sweater-26.png', featured: false },
+  { id: 'p5', name: 'Free MSO Kiss',    description: 'Free kiss from an MSO committee member of your choice!', priceCents: 0, currency: 'AUD', imageUrl: '/images/merch/freekiss.png', featured: false },
+  { id: 'p6', name: 'Meal Belanja Card - Dinner Later',    description: 'Free meal for dinner later from an MSO committee member of your choice!', priceCents: 0, currency: 'AUD', imageUrl: '/images/merch/beggar-emoji.png', featured: false },
 ]
 
 export const featuredProduct = products.find((p) => p.featured) ?? products[0]

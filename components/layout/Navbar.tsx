@@ -62,7 +62,7 @@ export default function Navbar() {
         </nav>
 
         <Link
-          href="/#join"
+          href="https://campus.hellorubric.com/?tab=memberships&s=8420"
           data-cursor="hover"
           className="hidden rounded-pill bg-primary px-6 py-3 font-heading
                      text-[13px] font-bold uppercase tracking-widest text-white

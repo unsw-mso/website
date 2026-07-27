@@ -59,7 +59,7 @@ export default function PageHero({
           stagger={0.08}
         />
         <AnimatedText delay={0.2}>
-          <p data-cursor="text" className="mt-7 text-xl text-text-60">
+          <p className="mt-7 text-xl text-text-60">
             {subtitle}
           </p>
         </AnimatedText>

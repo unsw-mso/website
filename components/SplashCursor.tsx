@@ -105,7 +105,18 @@ export default function SplashCursor({
       COLOR
     };
 
-    const { gl, ext } = getWebGLContext(canvas);
+    // Firefox (and any browser with WebGL disabled, blocklisted, or lacking
+    // hardware acceleration) can fail to create a context. getWebGLContext
+    // throws in that case, so guard it — degrade to no fluid cursor rather
+    // than crashing the whole page.
+    let webgl: ReturnType<typeof getWebGLContext>;
+    try {
+      webgl = getWebGLContext(canvas);
+    } catch (err) {
+      console.warn('SplashCursor: WebGL unavailable, skipping fluid cursor.', err);
+      return;
+    }
+    const { gl, ext } = webgl;
     if (!gl || !ext) return;
 
     if (!ext.supportLinearFiltering) {

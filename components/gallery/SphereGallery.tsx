@@ -6,6 +6,12 @@ import * as THREE from 'three'
 import { gsap } from '@/lib/utils/gsap'
 import { galleryCards, type GalleryCard } from './galleryData'
 
+// The archive shows PAST events only. Flip an event's `status` to 'upcoming'
+// in galleryData to pull it out of the sphere. (Falls back to all events if
+// none are marked past, so the sphere is never empty.)
+const pastCards = galleryCards.filter((c) => c.status === 'past')
+const archiveCards = pastCards.length > 0 ? pastCards : galleryCards
+
 /* ────────────────────────────────────────────────────────────────────────
    Sphere / grid tuning. We tile cards onto the INSIDE of a sphere and put
    the camera at the centre, so you're looking outward at a curved wall of
@@ -181,27 +187,18 @@ function drawCardFace(
   roundRect(ix + 0.5, iy + 0.5, iw - 1, ih - 1, r)
   ctx.stroke()
 
-  // ── meta row (date + tags + year), all bumped up in size ──
+  // ── meta row (single category pill on the left, year on the right) ──
   const my = iy + ih + 54
-  ctx.font = '600 30px "Space Grotesk", sans-serif'
+  ctx.font = '600 28px "Space Grotesk", sans-serif'
+  const catW = ctx.measureText(card.category).width
+  const pillW = catW + 44
+  ctx.strokeStyle = 'rgba(245,240,232,0.28)'
+  ctx.lineWidth = 1.5
+  roundRect(pad, my - 36, pillW, 50, 25)
+  ctx.stroke()
+  ctx.fillStyle = 'rgba(245,240,232,0.9)'
   ctx.textAlign = 'left'
-  ctx.fillStyle = 'rgba(245,240,232,0.95)'
-  ctx.fillText(card.date.toUpperCase(), pad, my)
-
-  // tag pills after the date
-  let px = pad + ctx.measureText(card.date.toUpperCase()).width + 24
-  ctx.font = '500 26px "Space Grotesk", sans-serif'
-  for (const tag of card.tags) {
-    const tw = ctx.measureText(tag).width
-    const pw = tw + 34
-    ctx.strokeStyle = 'rgba(245,240,232,0.24)'
-    ctx.lineWidth = 1.5
-    roundRect(px, my - 34, pw, 48, 24)
-    ctx.stroke()
-    ctx.fillStyle = 'rgba(245,240,232,0.78)'
-    ctx.fillText(tag, px + 17, my)
-    px += pw + 14
-  }
+  ctx.fillText(card.category, pad + 22, my)
 
   // year, right-aligned
   ctx.textAlign = 'right'
@@ -251,7 +248,7 @@ export default function SphereGallery() {
     // the gradient fallback drawn immediately, then swaps to the card image as
     // soon as it loads (redraw + needsUpdate) so nothing pops in blank.
     const loadedImages: HTMLImageElement[] = []
-    const textures = galleryCards.map((card) => {
+    const textures = archiveCards.map((card) => {
       const canvas = document.createElement('canvas')
       canvas.width = CARD_CANVAS_W
       canvas.height = CARD_CANVAS_H
@@ -302,7 +299,7 @@ export default function SphereGallery() {
       const rowOffset = (row % 2) * (Math.PI / COLS)
       for (let col = 0; col < COLS; col++) {
         const theta = (col / COLS) * Math.PI * 2 + rowOffset
-        const cardData = galleryCards[idx % galleryCards.length]
+        const cardData = archiveCards[idx % archiveCards.length]
         const mat = new THREE.MeshBasicMaterial({
           map: textures[idx % textures.length],
           transparent: true,
@@ -398,38 +395,52 @@ export default function SphereGallery() {
     window.addEventListener('pointermove', onMove)
     window.addEventListener('pointerup', onUp)
 
-    /* ── open / close detail ── */
+    /* ── open / close detail ──
+       The clicked card is re-parented from the (rotating) sphere group onto the
+       scene, so we can animate it in plain world space. The camera sits at the
+       origin looking down −z, so "upright and facing the camera" is simply the
+       identity quaternion, and we drop the card at a fixed point in front-left
+       of the camera, sized to stay fully visible beside the detail panel. */
     let flying: THREE.Mesh | null = null
-    const flyStore = { pos: new THREE.Vector3(), quat: new THREE.Quaternion(), scale: 1 }
+    // world-space transform captured at open, restored on close
+    const flyStore = { pos: new THREE.Vector3(), quat: new THREE.Quaternion() }
+    const tmpV = new THREE.Vector3()
+    const tmpQ = new THREE.Quaternion()
 
     const openDetail = (mesh: THREE.Mesh) => {
       frozen = true
       flying = mesh
-      flyStore.pos.copy(mesh.position)
-      flyStore.quat.copy(mesh.quaternion)
-      flyStore.scale = mesh.scale.x
 
-      // Bring the chosen card to the top of the render order
+      // remember exactly where it came from (world space), then detach to scene
+      mesh.updateWorldMatrix(true, false)
+      flyStore.pos.copy(mesh.getWorldPosition(tmpV))
+      flyStore.quat.copy(mesh.getWorldQuaternion(tmpQ))
+      scene.attach(mesh)
       ;(mesh.material as THREE.Material).depthTest = false
       mesh.renderOrder = 999
 
-      // A point ~2.4 units in front of the camera, along the card's view dir
-      const front = mesh.position.clone().normalize().multiplyScalar(2.4)
-      const faceCam = new THREE.Quaternion().setFromUnitVectors(
-        new THREE.Vector3(0, 0, 1),
-        front.clone().negate().normalize(),
-      )
+      // Fit an upright card into the front-left of the view.
+      const d = 4.2 // distance in front of the camera
+      const vFOV = THREE.MathUtils.degToRad(camera.fov)
+      const visH = 2 * d * Math.tan(vFOV / 2)
+      const visW = visH * camera.aspect
+      const targetScale = Math.min(2.0, (0.64 * visH) / CARD_H)
+      const cardW = CARD_W * targetScale
+      const narrow = sizeW() < 768
+      // narrow screens: the panel is full-width, so just centre the card behind it
+      const targetX = narrow ? 0 : -visW / 2 + cardW / 2 + 0.05 * visW
 
       gsap.to(mesh.position, {
-        x: front.x, y: front.y, z: front.z,
+        x: targetX, y: 0, z: -d,
         duration: 0.9, ease: 'power3.inOut',
       })
       gsap.to(mesh.scale, {
-        x: 2.05, y: 2.05, z: 2.05,
+        x: targetScale, y: targetScale, z: targetScale,
         duration: 0.9, ease: 'power3.inOut',
       })
+      // identity quaternion → plane faces +z (the camera), up stays world-up
       gsap.to(mesh.quaternion, {
-        x: faceCam.x, y: faceCam.y, z: faceCam.z, w: faceCam.w,
+        x: 0, y: 0, z: 0, w: 1,
         duration: 0.9, ease: 'power3.inOut',
       })
       // dim everyone else
@@ -451,13 +462,14 @@ export default function SphereGallery() {
         duration: 0.8, ease: 'power3.inOut',
       })
       gsap.to(mesh.scale, {
-        x: flyStore.scale, y: flyStore.scale, z: flyStore.scale,
+        x: 1, y: 1, z: 1,
         duration: 0.8, ease: 'power3.inOut',
       })
       gsap.to(mesh.quaternion, {
         x: flyStore.quat.x, y: flyStore.quat.y, z: flyStore.quat.z, w: flyStore.quat.w,
         duration: 0.8, ease: 'power3.inOut',
         onComplete: () => {
+          group.attach(mesh) // back onto the sphere, world transform preserved
           ;(mesh.material as THREE.Material).depthTest = true
           mesh.renderOrder = 0
           flying = null
@@ -634,64 +646,69 @@ function DetailPanel({ card, onClose }: { card: GalleryCard; onClose: () => void
     })
   }
 
+  // Detail hero image is independent of the card face: use `detailImage` if set,
+  // otherwise the card's own art, otherwise the /images/cards/<id>.png fallback.
+  const heroSrc = card.detailImage ?? card.image ?? `${CARD_IMAGE_DIR}/${card.id}.png`
+
   return (
     <div
       ref={ref}
-      className="absolute inset-y-0 right-0 z-20 flex w-full flex-col justify-between
-                 border-l border-line bg-bg/85 p-8 backdrop-blur-2xl md:w-[46%] md:p-14"
+      className="absolute inset-y-0 right-0 z-20 flex w-full flex-col overflow-y-auto
+                 border-l border-line bg-bg/85 p-6 backdrop-blur-2xl
+                 sm:p-8 md:w-[46%] md:p-14"
     >
-      <div>
-        <button
+      <button
+        data-detail-item
+        onClick={close}
+        className="mb-8 flex items-center gap-2 self-start font-heading text-[12px] uppercase
+                   tracking-widest text-text-60 transition-colors hover:text-primary md:mb-12"
+      >
+        ← Back to sphere
+      </button>
+
+      <div
+        data-detail-item
+        className="mb-5 inline-flex w-fit items-center gap-2 rounded-pill border border-primary/40
+                   bg-orange-tint px-4 py-1.5 font-heading text-[11px] uppercase
+                   tracking-widest text-primary"
+      >
+        {card.category}
+      </div>
+
+      <h1
+        data-detail-item
+        className="font-heading text-4xl font-bold uppercase leading-[0.95] tracking-tight
+                   text-text sm:text-5xl md:text-7xl"
+      >
+        {card.title}
+      </h1>
+
+      <p
+        data-detail-item
+        className="mt-3 font-heading text-[13px] uppercase tracking-[0.2em] text-text-muted"
+      >
+        {card.date} · {card.year}
+      </p>
+
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img
+        data-detail-item
+        src={heroSrc}
+        alt={card.title}
+        className="mt-8 aspect-[4/3] w-full rounded-lg object-cover md:mt-10"
+        style={{
+          background: `linear-gradient(135deg, ${card.colors[0]} 0%, ${card.colors[1]} 100%)`,
+        }}
+      />
+
+      {card.description && (
+        <p
           data-detail-item
-          onClick={close}
-          className="mb-12 flex items-center gap-2 font-heading text-[12px] uppercase
-                     tracking-widest text-text-60 transition-colors hover:text-primary"
+          className="mt-8 max-w-md text-[15px] leading-relaxed text-text-60 md:mt-10"
         >
-          ← Back to sphere
-        </button>
-
-        <div
-          data-detail-item
-          className="mb-6 inline-block rounded-pill border border-line px-4 py-1.5
-                     font-heading text-[11px] uppercase tracking-widest text-text-60"
-        >
-          {card.date} · {card.year}
-        </div>
-
-        <h1
-          data-detail-item
-          className="font-heading text-5xl font-bold uppercase leading-[0.95] tracking-tight
-                     text-text md:text-7xl"
-        >
-          {card.title}
-        </h1>
-
-        <div
-          data-detail-item
-          className="mt-10 h-[42vh] w-full overflow-hidden rounded-lg"
-          style={{
-            background: `linear-gradient(135deg, ${card.colors[0]} 0%, ${card.colors[1]} 100%)`,
-          }}
-        />
-
-        <p data-detail-item className="mt-10 max-w-md text-[15px] leading-relaxed text-text-60">
-          A moment from the {card.brand} archive. This template stands in for a full
-          case-study page — headline, hero, gallery and story would live here. The focus
-          of this build is the spherical gallery you just came from.
+          {card.description}
         </p>
-      </div>
-
-      <div data-detail-item className="flex flex-wrap gap-3 pt-8">
-        {card.tags.map((t) => (
-          <span
-            key={t}
-            className="rounded-pill border border-line px-4 py-2 font-heading text-[11px]
-                       uppercase tracking-widest text-text-60"
-          >
-            {t}
-          </span>
-        ))}
-      </div>
+      )}
     </div>
   )
 }

@@ -5,18 +5,21 @@ import { formatPrice, type Product } from '@/lib/data/merch'
 
 export default function ProductCard({
   product,
-  onBuy,
+  onSelect,
 }: {
   product: Product
-  onBuy: (product: Product) => void
+  onSelect: (product: Product) => void
 }) {
   return (
-    <article
-      className="group flex flex-col overflow-hidden rounded-lg border border-line
-                 bg-surface transition-all duration-300 ease-bounce
+    <button
+      type="button"
+      onClick={() => onSelect(product)}
+      data-cursor="hover"
+      className="group flex w-full flex-col overflow-hidden rounded-lg border border-line
+                 bg-surface text-left transition-all duration-300 ease-bounce
                  hover:-translate-y-2 hover:border-primary hover:shadow-glow"
     >
-      <div className="relative aspect-square overflow-hidden">
+      <div className="relative aspect-square w-full overflow-hidden">
         {product.imageUrl ? (
           <Image
             src={product.imageUrl}
@@ -50,17 +53,13 @@ export default function ProductCard({
         <span className="font-heading text-lg font-bold text-primary">
           {formatPrice(product.priceCents, product.currency)}
         </span>
-        <button
-          onClick={() => onBuy(product)}
-          data-cursor="hover"
-          className="mt-auto w-fit rounded-pill bg-primary px-7 py-2.5
-                     font-heading text-xs font-bold uppercase tracking-widest
-                     text-white transition-transform duration-300 ease-bounce
-                     hover:scale-105 active:scale-95"
+        <span
+          className="mt-auto pt-2 font-heading text-xs font-bold uppercase tracking-widest
+                     text-text-60 transition-colors group-hover:text-primary"
         >
-          Buy Now
-        </button>
+          View details →
+        </span>
       </div>
-    </article>
+    </button>
   )
 }

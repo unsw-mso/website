@@ -18,6 +18,9 @@ export default function HomePage() {
       </div>
       <HeroSplash targetId="hero" />
 
+      <AboutSnapshot />
+
+      {/* Banner strip sits between Our Story (AboutSnapshot) and the Mascot */}
       <MarqueeStrip
         className="bg-primary py-5"
         speed={20}
@@ -32,7 +35,6 @@ export default function HomePage() {
         ))}
       />
 
-      <AboutSnapshot />
       <TigerFall />
       <EventsPreview />
       <SponsorsStrip />

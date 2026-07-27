@@ -6,7 +6,7 @@ import SectionLabel from '@/components/ui/SectionLabel'
 import ProductCard from '@/components/cards/ProductCard'
 import { products, type Product } from '@/lib/data/merch'
 
-export default function ProductGrid({ onBuy }: { onBuy: (p: Product) => void }) {
+export default function ProductGrid({ onSelect }: { onSelect: (p: Product) => void }) {
   const section = useRef<HTMLElement>(null)
 
   useGSAP(
@@ -31,7 +31,7 @@ export default function ProductGrid({ onBuy }: { onBuy: (p: Product) => void }) 
         <div className="mt-12 grid gap-7 sm:grid-cols-2 lg:grid-cols-3">
           {products.map((product) => (
             <div key={product.id} data-product className="flex">
-              <ProductCard product={product} onBuy={onBuy} />
+              <ProductCard product={product} onSelect={onSelect} />
             </div>
           ))}
         </div>

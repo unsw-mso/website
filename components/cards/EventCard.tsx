@@ -8,8 +8,7 @@ export default function EventCard({ event }: { event: EventType }) {
     <article
       data-cursor="hover"
       /* group = lets child elements react to hover on this parent.
-         The lift + glow is pure CSS, per your spec — GSAP is overkill
-         for hover states and CSS transitions run off the main thread. */
+         The lift + glow is pure CSS */
       className="group flex flex-col overflow-hidden rounded-lg border
                  border-line bg-surface transition-all duration-300
                  ease-bounce hover:-translate-y-2 hover:border-primary
@@ -51,7 +50,7 @@ export default function EventCard({ event }: { event: EventType }) {
                          tracking-widest text-primary">
           {event.date} · {event.location}
         </span>
-        <p data-cursor="text" className="text-[15px] leading-relaxed text-text-60">
+        <p className="text-[15px] leading-relaxed text-text-60">
           {event.description}
         </p>
       </div>

@@ -5,7 +5,6 @@ import Link from 'next/link'
 import Image from 'next/image'
 import { gsap, useGSAP } from '@/lib/utils/gsap'
 import SectionLabel from '@/components/ui/SectionLabel'
-import TigerPlaceholder from '@/components/ui/TigerPlaceholder'
 import { upcomingEvents } from '@/lib/data/events'
 
 export default function UpcomingEvents() {
@@ -59,12 +58,17 @@ export default function UpcomingEvents() {
               to "present" anything and it would just eat a screenful. */}
           <div className="hidden md:block md:sticky md:top-[20vh]">
             <div ref={tiger} className="w-full max-w-[340px]">
-              <TigerPlaceholder flip className="h-auto w-full drop-shadow-2xl" />
-              {/* Real asset: /images/tiger-pointing.png, flipped so he
-                  gestures toward the card column on the right */}
+              <Image
+                src="/images/harimeow-events.png"
+                alt="MSO harimeow mascot"
+                width={986}
+                height={1076}
+                className="h-auto w-full drop-shadow-2xl"
+              />
             </div>
             <p className="mt-5 max-w-[280px] text-sm leading-relaxed text-text-muted">
-              Four events this term. He&apos;s excited about all of them.
+              {upcomingEvents.length} event{upcomingEvents.length === 1 ? '' : 's'} this
+              term. He&apos;s excited about all of them.
             </p>
           </div>
 
@@ -115,7 +119,7 @@ export default function UpcomingEvents() {
                                    tracking-widest text-primary">
                     {event.date} · {event.location}
                   </span>
-                  <p data-cursor="text" className="leading-relaxed text-text-60">
+                  <p className="leading-relaxed text-text-60">
                     {event.description}
                   </p>
                   <div className="mt-2">

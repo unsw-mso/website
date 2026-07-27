@@ -29,14 +29,14 @@ export default function AboutSnapshot() {
 
         <div className="flex flex-col gap-6 pb-2">
           <AnimatedText delay={0.1}>
-            <p data-cursor="text" className="text-lg leading-relaxed text-text">
+            <p className="text-lg leading-relaxed text-text">
               MSO is home for every Malaysian at UNSW — and everyone who loves
               Malaysia. From mamak nights to Merdeka celebrations, we keep the
               flavours, festivals and friendships alive in Sydney.
             </p>
           </AnimatedText>
           <AnimatedText delay={0.2}>
-            <p data-cursor="text" className="leading-relaxed text-text-muted">
+            <p className="leading-relaxed text-text-muted">
               One of UNSW&apos;s largest cultural societies, run by students,
               for students.
             </p>

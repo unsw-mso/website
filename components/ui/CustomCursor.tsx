@@ -36,12 +36,6 @@ export default function CustomCursor() {
           width: 44, height: 44, opacity: 0.55, borderRadius: '50%',
           duration: 0.4, ease: 'back.out(2.5)',
         })
-      } else if (mode === 'text') {
-        // Morphs into an I-beam caret over paragraph text
-        gsap.to(el, {
-          width: 2, height: 24, opacity: 1, borderRadius: '1px',
-          duration: 0.3, ease: 'power3.out',
-        })
       } else {
         gsap.to(el, {
           width: 14, height: 14, opacity: 1, borderRadius: '50%',

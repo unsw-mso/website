@@ -63,7 +63,7 @@ export default function FeaturedProduct({ onBuy }: { onBuy: (p: Product) => void
                          uppercase leading-none tracking-tight text-text">
             {featuredProduct.name}
           </h2>
-          <p data-cursor="text" className="text-lg leading-relaxed text-text-60">
+          <p className="text-lg leading-relaxed text-text-60">
             {featuredProduct.description}
           </p>
           <span className="font-heading text-3xl font-bold text-primary">

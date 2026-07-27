@@ -3,6 +3,10 @@ export interface Sponsor {
   name: string
   logoUrl: string           // '' → renders the name as a wordmark
   website?: string
+  /** shown as the pill in the detail panel, e.g. 'Gold Partner' */
+  tier?: string
+  /** short blurb shown in the detail panel */
+  blurb?: string
 }
 
 // Replace with real partners. Names render as text wordmarks until you

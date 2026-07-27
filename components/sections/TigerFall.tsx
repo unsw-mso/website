@@ -1,11 +1,11 @@
 'use client'
 
 import { useRef } from 'react'
+import Image from 'next/image'
 import { gsap, useGSAP } from '@/lib/utils/gsap'
 import SectionLabel from '@/components/ui/SectionLabel'
 import SplitText from '@/components/ui/SplitText'
 import AnimatedText from '@/components/ui/AnimatedText'
-import TigerPlaceholder from '@/components/ui/TigerPlaceholder'
 
 export default function TigerFall() {
   const section = useRef<HTMLElement>(null)
@@ -66,7 +66,7 @@ export default function TigerFall() {
                        uppercase leading-[1.02] tracking-tight text-text"
           />
           <AnimatedText delay={0.15}>
-            <p data-cursor="text"
+            <p
                className="mt-7 max-w-md text-lg leading-relaxed text-text-muted">
               400+ members, one big family. Wherever you&apos;re from in
               Malaysia — or beyond — there&apos;s a seat at our table.
@@ -85,10 +85,13 @@ export default function TigerFall() {
             // browser doesn't repaint the whole section every frame
             style={{ willChange: 'transform' }}
           >
-            <TigerPlaceholder className="h-auto w-full drop-shadow-2xl" />
-            {/* REPLACE with the real asset when it arrives:
-                <Image src="/images/tiger-3d.png" alt="MSO tiger mascot"
-                       width={440} height={440} className="h-auto w-full" /> */}
+            <Image
+              src="/images/harimeow-home.png"
+              alt="MSO harimeow mascot"
+              width={1141}
+              height={1037}
+              className="h-auto w-full drop-shadow-2xl"
+            />
           </div>
         </div>
       </div>

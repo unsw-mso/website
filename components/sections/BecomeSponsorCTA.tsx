@@ -23,7 +23,7 @@ export default function BecomeSponsorCTA() {
                      leading-[0.95] tracking-tight text-text"
         />
         <AnimatedText delay={0.15}>
-          <p data-cursor="text" className="max-w-xl text-lg leading-relaxed text-text-60">
+          <p className="max-w-xl text-lg leading-relaxed text-text-60">
             Put your brand in front of thousands of engaged students at one of
             UNSW&apos;s largest cultural societies.
           </p>

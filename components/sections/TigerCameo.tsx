@@ -1,8 +1,8 @@
 'use client'
 
 import { useRef } from 'react'
+import Image from 'next/image'
 import { gsap, useGSAP } from '@/lib/utils/gsap'
-import TigerPlaceholder from '@/components/ui/TigerPlaceholder'
 
 export default function TigerCameo() {
   const wrap = useRef<HTMLDivElement>(null)
@@ -39,7 +39,13 @@ export default function TigerCameo() {
         className="ml-auto w-[180px] translate-x-[22%] rotate-[-12deg]
                    md:w-[260px]"
       >
-        <TigerPlaceholder className="h-auto w-full drop-shadow-2xl" />
+        <Image
+          src="/images/harimeow-comm.png"
+          alt="MSO harimeow mascot"
+          width={975}
+          height={992}
+          className="h-auto w-full drop-shadow-2xl"
+        />
       </div>
     </div>
   )

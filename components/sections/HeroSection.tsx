@@ -9,6 +9,7 @@ export default function HeroSection() {
   const photo = useRef<HTMLDivElement>(null)
   const titleA = useRef<HTMLDivElement>(null)   // MALAYSIAN STUDENTS ORGANISATION
   const titleB = useRef<HTMLDivElement>(null)   // UNSW MSO
+  const reveal = useRef<HTMLDivElement>(null)   // circular wipe into the page
   const cue = useRef<HTMLDivElement>(null)
 
   useGSAP(
@@ -59,7 +60,9 @@ export default function HeroSection() {
         scrollTrigger: {
           trigger: section.current,
           start: 'top top',
-          end: '+=100%',
+          // Extra scroll room: the first ~half zooms the photo out, the
+          // second ~half grows the circular wipe into the rest of the page.
+          end: '+=185%',
           pin: true,
           scrub: 1.2,
           // Prevents a 1px gap appearing under the pinned section in
@@ -75,7 +78,7 @@ export default function HeroSection() {
         .to(photo.current, { scale: 0.75, borderRadius: 32, ease: 'none' }, 0)
         // First title fades and drifts up, finishing at 60% of the scroll
         .to(titleA.current, { opacity: 0, y: -30, ease: 'none', duration: 0.6 }, 0)
-        // Second title starts at 30% progress and overlaps the first's exit
+        // Second title (blocky UNSW MSO) fades in, overlapping the first's exit
         .fromTo(
           titleB.current,
           { opacity: 0, y: 20 },
@@ -84,6 +87,11 @@ export default function HeroSection() {
         )
         // Scroll cue disappears early — it's done its job
         .to(cue.current, { opacity: 0, ease: 'none', duration: 0.25 }, 0)
+        // Circular wipe (same idea as the events-archive portal, but scroll-
+        // driven and in the page's own bg colour): a bg-bg disc grows from the
+        // centre until it swallows the hero, handing off seamlessly to the rest
+        // of the home page which shares that background.
+        .to(reveal.current, { scale: 1, ease: 'power1.in', duration: 0.9 }, 0.95)
 
       /* ==========================================================
          PART 3 — REFRESH AFTER THE PHOTO LOADS
@@ -107,8 +115,16 @@ export default function HeroSection() {
   return (
     <section
       ref={section}
-      className="relative h-screen w-full overflow-hidden bg-[#1a1008]"
+      className="relative h-screen w-full overflow-hidden bg-bg"
     >
+      {/* Wavy backdrop revealed as the photo zooms out. Sits behind the photo
+          in DOM order so it only shows in the margins once the photo shrinks. */}
+      <div
+        aria-hidden
+        className="absolute inset-0 bg-[#E0702E] bg-cover bg-center"
+        style={{ backgroundImage: "url('/images/orange-backdrop.png')" }}
+      />
+
       {/* Photo wrapper is what GSAP scales — never the <Image> itself,
           because next/image manages its own inline styles. */}
       <div ref={photo} className="absolute inset-0 overflow-hidden">
@@ -170,7 +186,7 @@ export default function HeroSection() {
                        uppercase leading-none tracking-tight text-primary">
           UNSW MSO
         </h2>
-        <p className="text-base text-[#F5F0E8]/60">Malaysia&apos;s home at UNSW</p>
+        <p className="text-base text-text-60">Malaysia&apos;s home at UNSW</p>
       </div>
 
       {/* ---- Scroll cue ---- */}
@@ -182,6 +198,17 @@ export default function HeroSection() {
         <span className="h-14 w-px bg-[#F5F0E8]/50" />
         <span className="h-2 w-2 animate-bounce rounded-full bg-primary" />
       </div>
+
+      {/* Circular wipe disc — the page's own bg colour (cream in light mode,
+          near-black in dark). Starts collapsed; the scroll timeline grows it to
+          cover the hero and blend into the sections below. Last child = on top. */}
+      <div
+        ref={reveal}
+        aria-hidden
+        className="pointer-events-none absolute left-1/2 top-1/2 aspect-square
+                   w-[160vmax] -translate-x-1/2 -translate-y-1/2 scale-0
+                   rounded-full bg-bg"
+      />
     </section>
   )
 }

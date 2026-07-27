@@ -10,7 +10,6 @@ export default function HeroSection() {
   const titleA = useRef<HTMLDivElement>(null)   // MALAYSIAN STUDENTS ORGANISATION
   const titleB = useRef<HTMLDivElement>(null)   // UNSW MSO
   const reveal = useRef<HTMLDivElement>(null)   // circular wipe into the page
-  const cue = useRef<HTMLDivElement>(null)
 
   useGSAP(
     () => {
@@ -33,7 +32,6 @@ export default function HeroSection() {
           '-=0.9',
         )
         .from('[data-hero-sub]', { y: 20, opacity: 0, duration: 0.6 }, '-=0.4')
-        .from(cue.current, { y: 20, opacity: 0, duration: 0.6 }, '-=0.3')
 
       /* ==========================================================
          PART 2 — THE PINNED SCROLL TRANSFORMATION
@@ -85,8 +83,6 @@ export default function HeroSection() {
           { opacity: 1, y: 0, ease: 'none', duration: 0.5 },
           0.3,
         )
-        // Scroll cue disappears early — it's done its job
-        .to(cue.current, { opacity: 0, ease: 'none', duration: 0.25 }, 0)
         // Circular wipe (same idea as the events-archive portal, but scroll-
         // driven and in the page's own bg colour): a bg-bg disc grows from the
         // centre until it swallows the hero, handing off seamlessly to the rest
@@ -182,20 +178,10 @@ export default function HeroSection() {
         className="absolute inset-0 flex flex-col items-center justify-center
                    gap-4 px-6 text-center opacity-0"
       >
-        <h2 className="font-heading text-[clamp(56px,10vw,112px)] font-bold
+        <h2 className="font-heading text-[clamp(68px,12vw,140px)] font-bold
                        uppercase leading-none tracking-tight text-primary">
           MSO
         </h2>
-      </div>
-
-      {/* ---- Scroll cue ---- */}
-      <div
-        ref={cue}
-        className="absolute bottom-9 left-1/2 flex -translate-x-1/2
-                   flex-col items-center gap-2"
-      >
-        <span className="h-14 w-px bg-[#F5F0E8]/50" />
-        <span className="h-2 w-2 animate-bounce rounded-full bg-primary" />
       </div>
 
       {/* Circular wipe disc — the page's own bg colour (cream in light mode,

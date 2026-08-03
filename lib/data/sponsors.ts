@@ -16,9 +16,4 @@ export const sponsors: Sponsor[] = [
   { id: 's2', name: 'Dynasty Karaoke',   logoUrl: '/images/sponsors/dynastykar.png' },
   { id: 's3', name: 'Future Spects Pty Ltd',  logoUrl: '/images/sponsors/keku.png' },
   { id: 's4', name: 'Tiger Pocha',  logoUrl: '/images/sponsors/tigerpocha.png' },
-
-  { id: 's5', name: 'Sponsor Five',  logoUrl: '' },
-  { id: 's6', name: 'Sponsor Six',   logoUrl: '' },
-  { id: 's7', name: 'Sponsor Seven', logoUrl: '' },
-  { id: 's8', name: 'Sponsor Eight', logoUrl: '' },
 ]

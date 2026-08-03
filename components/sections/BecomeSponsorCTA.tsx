@@ -3,7 +3,7 @@
 import SplitText from '@/components/ui/SplitText'
 import AnimatedText from '@/components/ui/AnimatedText'
 
-const EMAIL = 'sponsors@unswmso.org'
+const EMAIL = 'sponsorship.unswmso@gmail.com'
 
 export default function BecomeSponsorCTA() {
   return (

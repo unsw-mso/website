@@ -23,8 +23,6 @@ export const products: Product[] = [
   { id: 'p2', name: 'Oriental Jersey',   description: '2025 MSO Jersey made to be lightweight and sweat-wicking, where street grit meets Malaysian batik. Styled in motion, shot in transit. Made by athletes, for athletes.',    priceCents: 2100, currency: 'AUD', imageUrl: '/images/merch/jersey.jpg', featured: false },
   { id: 'p3', name: 'Olive MSO Tee (COMING SOON !)', description: 'COMING SOON - Be Patient!',        priceCents: 0, currency: 'AUD', imageUrl: '/images/merch/shirtback-26.png', featured: false },
   { id: 'p4', name: 'Guess Who? Sweater (COMING SOON !)', description: 'COMING SOON - Be Patient!',        priceCents: 0, currency: 'AUD', imageUrl: '/images/merch/sweater-26.png', featured: false },
-  { id: 'p5', name: 'Free MSO Kiss',    description: 'Free kiss from an MSO committee member of your choice!', priceCents: 0, currency: 'AUD', imageUrl: '/images/merch/freekiss.png', featured: false },
-  { id: 'p6', name: 'Meal Belanja Card - Dinner Later',    description: 'Free meal for dinner later from an MSO committee member of your choice!', priceCents: 0, currency: 'AUD', imageUrl: '/images/merch/beggar-emoji.png', featured: false },
 ]
 
 export const featuredProduct = products.find((p) => p.featured) ?? products[0]

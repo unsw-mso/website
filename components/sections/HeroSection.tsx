@@ -179,7 +179,7 @@ export default function HeroSection() {
                    gap-4 px-6 text-center opacity-0"
       >
         <h2 className="font-heading text-[clamp(68px,12vw,140px)] font-bold
-                       uppercase leading-none tracking-tight text-primary">
+                       uppercase leading-none tracking-tight text-white">
           MSO
         </h2>
       </div>

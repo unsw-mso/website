@@ -13,36 +13,45 @@ export default function TigerFall() {
 
   useGSAP(
     () => {
-      /* Scrubbed timeline with THREE keyframe positions, per your spec:
-         top of section → middle → bottom.
+      /* PINNED FALL — the section sticks to the viewport while the tiger
+         falls down the screen, so it "follows the view" instead of
+         scrolling past. Same pinning mechanism as the hero
+         (HeroSection.tsx) and the merch video hero.
 
-         Note this is NOT pinned. The section scrolls normally; only the
-         tiger's position within it is driven by scroll progress. That's
-         a lighter, less disorienting effect than a second pin so soon
-         after the hero.
+         start 'top top' = pin once the section's top reaches the top of
+         the viewport. end '+=150%' = hold the pin for 1.5 extra viewport
+         heights of scrolling; raise it for a slower / longer fall, lower
+         it for a quicker one. anticipatePin avoids a subpixel gap under
+         the pinned section on some browsers.
 
-         start 'top bottom' = begin as the section's top enters from below
-         end   'bottom top' = finish as its bottom exits past the top,
-         which spreads the fall across the section's entire time on screen. */
+         The fall distance is driven in VIEWPORT-relative pixels (a
+         function so it re-measures on every ScrollTrigger refresh /
+         resize) rather than yPercent, so the enlarged tiger always
+         traverses the full screen height regardless of its own size. */
       const tl = gsap.timeline({
         scrollTrigger: {
           trigger: section.current,
-          start: 'top bottom',
-          end: 'bottom top',
+          start: 'top top',
+          end: '+=150%',
+          pin: true,
           scrub: 1.4,
+          anticipatePin: 1,
         },
       })
+
+      // How far down the screen the tiger travels (top → near bottom).
+      const fall = () => window.innerHeight * 0.72
 
       tl
         // Position 1 → 2: falls to mid-height, tumbling clockwise
         .fromTo(
           tiger.current,
-          { yPercent: -10, rotate: -14, xPercent: 0 },
-          { yPercent: 45, rotate: 12, xPercent: -18, ease: 'none' },
+          { y: () => -fall() * 0.12, rotate: -14, xPercent: 0 },
+          { y: () => fall() * 0.5, rotate: 12, xPercent: -18, ease: 'none' },
         )
         // Position 2 → 3: continues to the bottom, rotation eases back
         .to(tiger.current, {
-          yPercent: 95,
+          y: fall,
           rotate: -6,
           xPercent: 4,
           ease: 'none',
@@ -54,7 +63,7 @@ export default function TigerFall() {
   return (
     <section
       ref={section}
-      className="relative min-h-[760px] overflow-hidden px-6 py-32
+      className="relative min-h-screen overflow-hidden px-6 py-32
                  md:px-12 md:py-40"
     >
       <div className="mx-auto grid max-w-[1440px] gap-12 md:grid-cols-2 md:gap-16">
@@ -76,13 +85,13 @@ export default function TigerFall() {
           </AnimatedText>
         </div>
 
-        {/* Fixed-height track the tiger falls through. Without an explicit
-            min-height the absolutely-positioned tiger has nothing to
-            travel within and the percentages collapse. */}
-        <div className="relative min-h-[560px] md:min-h-[640px]">
+        {/* Full-height track the tiger falls through. While the section is
+            pinned this spans the viewport, giving the absolutely-positioned
+            tiger the room it needs to fall the whole screen height. */}
+        <div className="relative min-h-[70vh] md:min-h-screen">
           <div
             ref={tiger}
-            className="absolute right-[12%] top-0 w-[160px] md:w-[220px]"
+            className="absolute right-[8%] top-0 w-[320px] md:w-[440px]"
             // will-change promotes this to its own GPU layer so the
             // browser doesn't repaint the whole section every frame
             style={{ willChange: 'transform' }}

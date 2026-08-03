@@ -51,8 +51,8 @@ export const committee: CommitteeMember[] = [
   { id: 'c31',  name: 'Aiman Firdaus',   role: 'Subcommittee', department: 'Creatives', imageUrl: '/images/committee/aiman.webp' },
 
   { id: 'c32',  name: 'Aidan Chew',   role: 'Director', department: 'Marketing', imageUrl: '/images/committee/aidanchew.webp' },
-  { id: 'c33',  name: 'Bryan Bong',   role: 'Director', department: 'Marketing', imageUrl: '' },
-  { id: 'c34',  name: 'Juvene Chang',   role: 'Subcommittee', department: 'Marketing', imageUrl: '' },
+  { id: 'c33',  name: 'Bryan Bong',   role: 'Director', department: 'Marketing', imageUrl: '/images/committee/bryan.webp' },
+  { id: 'c34',  name: 'Juvene Chang',   role: 'Subcommittee', department: 'Marketing', imageUrl: '/images/committee/juvene.webp' },
   { id: 'c35',  name: 'Jonas Cheng',   role: 'Subcommittee', department: 'Marketing', imageUrl: '' },
 
   { id: 'c36',  name: 'Qiao Yi Tan',   role: 'Director', department: 'Treasurer', imageUrl: '/images/committee/qiaoyi.webp' },

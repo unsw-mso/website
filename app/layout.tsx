@@ -25,15 +25,24 @@ const inter = Inter({
 
 export const metadata: Metadata = {
   title: {
-    default: 'UNSW MSO — Malaysian Students Organisation',
-    template: '%s · UNSW MSO',
+    default: 'MSO',
+    template: '%s · MSO',
   },
   description: 
     "Malaysia's home at UNSW. Events, community and culture for Malaysian students in Sydney.",
     
   // Required for Open Graph images to resolve to absolute URLs
   // !!! Swap unswmso.org for your real domain when you have it.
-  metadataBase: new URL('https://unswmso.org'),
+  metadataBase: new URL('https://unswmso.vercel.app'),
+  manifest: '/site.webmanifest',
+  icons: {
+    icon: [
+      { url: '/favicon.ico', sizes: 'any'},
+      { url: '/favicon-16x16.png', sizes: '16x16', type: 'image/png' },
+      { url: '/favicon-32x32.png', sizes: '32x32', type: 'image/png' },
+    ],
+    apple: '/apple-touch-icon.png',
+  },
   openGraph: {
     type: 'website',
     locale: 'en_AU',

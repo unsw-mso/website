@@ -4,9 +4,7 @@
    Usage: <div className="light:text-black"> */
 @custom-variant light (&:where([data-theme="light"], [data-theme="light"] *));
 
-/* ============================================================
-   RAW TOKENS — plain CSS vars. These are what actually swap.
-   ============================================================ */
+
 :root {
   --primary:       #FF6B00;
   --primary-dark:  #CC5500;

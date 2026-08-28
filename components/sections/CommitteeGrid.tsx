@@ -3,10 +3,12 @@
 import { useRef } from 'react'
 import { gsap, useGSAP } from '@/lib/utils/gsap'
 import TeamCard from '@/components/cards/TeamCard'
+import { useMemberSpotlight } from '@/components/sections/useMemberSpotlight'
 import { generalCommittee, DEPARTMENTS } from '@/lib/data/committee'
 
 export default function CommitteeGrid() {
   const section = useRef<HTMLElement>(null)
+  const { open: openMember, spotlight } = useMemberSpotlight()
 
   useGSAP(
     () => {
@@ -49,7 +51,7 @@ export default function CommitteeGrid() {
               <div className="mt-8 grid grid-cols-2 gap-5 md:grid-cols-3 lg:grid-cols-4">
                 {members.map((member) => (
                   <div key={member.id} data-member>
-                    <TeamCard member={member} />
+                    <TeamCard member={member} onSelect={openMember} />
                   </div>
                 ))}
               </div>
@@ -57,6 +59,8 @@ export default function CommitteeGrid() {
           )
         })}
       </div>
+
+      {spotlight}
     </section>
   )
 }

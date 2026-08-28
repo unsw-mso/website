@@ -3,7 +3,14 @@
 import Image from 'next/image'
 import type { CommitteeMember } from '@/lib/data/committee'
 
-export default function TeamCard({ member }: { member: CommitteeMember }) {
+export default function TeamCard({
+  member,
+  onSelect,
+}: {
+  member: CommitteeMember
+  /** Fired on click; opens the member spotlight. */
+  onSelect?: (member: CommitteeMember) => void
+}) {
   // Two-letter monogram as a photo stand-in
   const initials = member.name
     .split(' ')
@@ -12,10 +19,12 @@ export default function TeamCard({ member }: { member: CommitteeMember }) {
     .join('')
 
   return (
-    <div
+    <button
+      type="button"
+      onClick={() => onSelect?.(member)}
       data-cursor="hover"
-      className="group relative aspect-[3/4] overflow-hidden rounded-lg border
-                 border-line bg-surface transition-all duration-300 ease-bounce
+      className="group relative block aspect-[3/4] w-full overflow-hidden rounded-lg
+                 border border-line bg-surface transition-all duration-300 ease-bounce
                  hover:-translate-y-1.5 hover:border-primary hover:shadow-glow"
     >
       {member.imageUrl ? (
@@ -69,6 +78,6 @@ export default function TeamCard({ member }: { member: CommitteeMember }) {
           {member.role}
         </span>
       </div>
-    </div>
+    </button>
   )
 }

@@ -3,10 +3,12 @@
 import { useRef } from 'react'
 import Image from 'next/image'
 import { gsap, useGSAP } from '@/lib/utils/gsap'
+import { useMemberSpotlight } from '@/components/sections/useMemberSpotlight'
 import { executives } from '@/lib/data/committee'
 
 export default function PresidentFeature() {
   const section = useRef<HTMLElement>(null)
+  const { open: openMember, spotlight } = useMemberSpotlight()
 
   useGSAP(
     () => {
@@ -30,13 +32,15 @@ export default function PresidentFeature() {
     <section ref={section} className="px-6 pb-24 pt-4 md:px-12">
       <div className="mx-auto grid max-w-[1440px] gap-7 md:grid-cols-[1.4fr_1fr]">
         {executives.map((exec) => (
-          <article
+          <button
             key={exec.id}
+            type="button"
             data-exec-card
             data-cursor="hover"
+            onClick={() => openMember(exec)}
             className="group relative flex min-h-[440px] items-center justify-center
                        overflow-hidden rounded-xl border-t-[3px] border-primary
-                       bg-surface transition-transform duration-300 ease-bounce
+                       bg-surface text-left transition-transform duration-300 ease-bounce
                        hover:-translate-y-2 md:min-h-[560px]"
           >
             {exec.imageUrl ? (
@@ -69,9 +73,11 @@ export default function PresidentFeature() {
                 {exec.role}
               </div>
             </div>
-          </article>
+          </button>
         ))}
       </div>
+
+      {spotlight}
     </section>
   )
 }

@@ -34,7 +34,7 @@ export const metadata: Metadata = {
     
   // Required for Open Graph images to resolve to absolute URLs
   // !!! Swap unswmso.org for your real domain when you have it.
-  metadataBase: new URL('https://unswmso.vercel.app'),
+  metadataBase: new URL('https://www.unswmso.com'),
   manifest: '/site.webmanifest',
   icons: {
     icon: [

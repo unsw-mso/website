@@ -52,6 +52,21 @@ export interface EventItem {
 
 export const events: EventItem[] = [
   {
+    id: 'mso-testtttt',
+    title: 'TEST',
+    date: '25 JUL',
+    year: '2026',
+    time: '',
+    status: 'upcoming',
+    category: 'SPORTS',
+    location: '',
+    description: '',
+    registrationLink: '',
+    colors: ['#FF8B33', '#7A1E00'],
+    accent: '#FFD9B0',
+    brand: 'MSO',
+  },
+  {
     id: 'mso-volleyball',
     title: 'Volleyball',
     date: '25 JUL',

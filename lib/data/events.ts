@@ -1,37 +1,337 @@
-import { galleryCards, cardImage, type GalleryCard } from '@/components/gallery/galleryData'
+/**
+ * ALL MSO EVENTS — the single source of truth.
+ *
+ * Every page reads from this list:
+ *   - /events “Upcoming” cards + their detail panel  → status: 'upcoming'
+ *   - /gallery archive sphere + home “Recent Events” → status: 'past'
+ * Flip 'status' to move an event between them. Order matters: keep the
+ * list newest-first (home “Recent Events” shows the first 10 past events).
+ *
+ * Fields
+ *   id               unique slug; also the default image name (see image)
+ *   title            event name
+ *   date             display date, e.g. '25 JUL'
+ *   year             e.g. '2026'
+ *   time             optional, e.g. '6:00 PM – 9:00 PM' ('' = hidden)
+ *   status           'upcoming' | 'past'
+ *   category         'SOCIAL' | 'SPORTS' | 'CAREER' (pill on cards/panels)
+ *   location         optional, e.g. 'Roundhouse, UNSW' ('' = hidden)
+ *   description      optional text shown in the detail panel ('' = hidden)
+ *   registrationLink optional sign-up URL; shows a Register button ('' = hidden)
+ *   image            optional card art path under /public;
+ *                    defaults to /images/cards/<id>.png
+ *   detailImage      optional different image for the detail panel
+ *   colors           [top, bottom] gradient used when an image is missing
+ *   accent           small accent colour on the sphere card art
+ *   brand            label printed on the sphere card art (usually 'MSO')
+ *
+ * Remember to compress images before adding them!
+ */
 
-export interface EventType {
+export type EventCategory = 'SOCIAL' | 'SPORTS' | 'CAREER'
+export type EventStatus = 'upcoming' | 'past'
+
+export interface EventItem {
   id: string
   title: string
   date: string
-  location: string
-  description: string
-  imageUrl: string          // '' → card renders a gradient fallback
+  year: string
+  time?: string
+  status: EventStatus
+  category: EventCategory
+  location?: string
+  description?: string
   registrationLink?: string
-  past: boolean
-  year?: string             // display-only, used by the past-events grid
+  image?: string
+  detailImage?: string
+  colors: [string, string]
+  accent: string
+  brand: string
 }
 
-/* Events now live in ONE place — components/gallery/galleryData.ts. These two
-   lists are derived from it by `status`, so flipping an event upcoming↔past in
-   galleryData moves it between the Upcoming section and the archive/past grid
-   automatically, with no edits here. */
-const toEventType = (c: GalleryCard): EventType => ({
-  id: c.id,
-  title: c.title,
-  date: `${c.date} ${c.year}`,
-  location: c.location ?? c.category,
-  description: c.description ?? '',
-  imageUrl: cardImage(c),
-  registrationLink: c.registrationLink ?? '#',
-  past: c.status === 'past',
-  year: c.year,
-})
+export const events: EventItem[] = [
+  {
+    id: 'mso-volleyball',
+    title: 'Volleyball',
+    date: '25 JUL',
+    year: '2026',
+    time: '',
+    status: 'upcoming',
+    category: 'SPORTS',
+    location: '',
+    description: '',
+    registrationLink: '',
+    colors: ['#FF8B33', '#7A1E00'],
+    accent: '#FFD9B0',
+    brand: 'MSO',
+  },
+  {
+    id: 'mso-captainball',
+    title: 'Captainball',
+    date: '18 JUL',
+    year: '2026',
+    time: '',
+    status: 'upcoming',
+    category: 'SPORTS',
+    location: '',
+    description: '',
+    registrationLink: '',
+    colors: ['#1D1D1D', '#FF6B00'],
+    accent: '#FF8B33',
+    brand: 'MSO',
+  },
+  {
+    id: 'mso-racialharmony',
+    title: 'Racial Harmony Day',
+    date: '24 JUL',
+    year: '2026',
+    time: '',
+    status: 'upcoming',
+    category: 'SOCIAL',
+    location: '',
+    description: '',
+    registrationLink: '',
+    colors: ['#3A0CA3', '#F72585'],
+    accent: '#FFC2E2',
+    brand: 'MSO',
+  },
+  {
+    id: 'mso-munch&mingle',
+    title: 'Munch & Mingle',
+    date: '17 JUL',
+    year: '2026',
+    time: '',
+    status: 'past',
+    category: 'SOCIAL',
+    location: '',
+    description: '',
+    colors: ['#0EA5A0', '#053B39'],
+    accent: '#8AF0EC',
+    brand: 'MSO',
+  },
+  {
+    id: 'mso-slice&settle',
+    title: 'Slice & Settle',
+    date: '14 JUL',
+    year: '2026',
+    time: '',
+    status: 'past',
+    category: 'SOCIAL',
+    location: '',
+    description: '',
+    colors: ['#FF6B00', '#B23A00'],
+    accent: '#FFD0A8',
+    brand: 'MSO',
+  },
+  {
+    id: 'mso-gaming',
+    title: 'Gaming Tournament',
+    date: '4 JUL',
+    year: '2026',
+    time: '',
+    status: 'past',
+    category: 'SOCIAL',
+    location: '',
+    description: '',
+    colors: ['#F2C14E', '#8A5A00'],
+    accent: '#FFF0C2',
+    brand: 'MSO',
+  },
+  {
+    id: 'mso-runclub',
+    title: 'Run Club',
+    date: '21 JUN',
+    year: '2026',
+    time: '',
+    status: 'past',
+    category: 'SPORTS',
+    location: '',
+    description: '',
+    colors: ['#E63946', '#4B0A0F'],
+    accent: '#FFB3B8',
+    brand: 'MSO',
+  },
+  {
+    id: 'mso-basketball',
+    title: 'Basketball',
+    date: '19 JUN',
+    year: '2026',
+    time: '',
+    status: 'past',
+    category: 'SPORTS',
+    location: '',
+    description: '',
+    colors: ['#6F4E37', '#241109'],
+    accent: '#D9B38C',
+    brand: 'MSO',
+  },
+  {
+    id: 'mso-badminton',
+    title: 'Badminton',
+    date: '14 JUN',
+    year: '2026',
+    time: '',
+    status: 'past',
+    category: 'SPORTS',
+    location: '',
+    description: '',
+    colors: ['#2A9D8F', '#14532D'],
+    accent: '#B7F0D8',
+    brand: 'MSO',
+  },
+  {
+    id: 'mso-agile',
+    title: 'Agile Workshop',
+    date: '13 JUN',
+    year: '2026',
+    time: '',
+    status: 'past',
+    category: 'CAREER',
+    location: '',
+    description: '',
+    colors: ['#457B9D', '#0D1F2D'],
+    accent: '#A8D0E6',
+    brand: 'MSO',
+  },
+  {
+    id: 'mso-speedfriending',
+    title: 'Speedfriending',
+    date: '5 JUN',
+    year: '2026',
+    time: '',
+    status: 'past',
+    category: 'SOCIAL',
+    location: '',
+    description: '',
+    colors: ['#264653', '#0B1F26'],
+    accent: '#7FB3C4',
+    brand: 'MSO',
+  },
+  {
+    id: 'mso-saharanights',
+    title: 'Pub Crawl - Sahara Nights',
+    date: '25 APR',
+    year: '2026',
+    time: '',
+    status: 'past',
+    category: 'SOCIAL',
+    location: '',
+    description: '',
+    colors: ['#B5179E', '#3A0CA3'],
+    accent: '#F4B8E8',
+    brand: 'MSO',
+  },
+  {
+    id: 'mso-netball',
+    title: 'Netball',
+    date: '17 APR',
+    year: '2026',
+    time: '',
+    status: 'past',
+    category: 'SPORTS',
+    location: '',
+    description: '',
+    colors: ['#C97B3C', '#5A2E12'],
+    accent: '#F2C79B',
+    brand: 'MSO',
+  },
+  {
+    id: 'mso-study&brew',
+    title: 'Study & Brew',
+    date: '17 APR',
+    year: '2026',
+    time: '',
+    status: 'past',
+    category: 'SOCIAL',
+    location: '',
+    description: '',
+    colors: ['#7209B7', '#1A0533'],
+    accent: '#C9A0FF',
+    brand: 'MSO',
+  },
+  {
+    id: 'mso-network',
+    title: 'Panel Talk X Networking',
+    date: '11 APR',
+    year: '2026',
+    time: '',
+    status: 'past',
+    category: 'CAREER',
+    location: '',
+    description: '',
+    colors: ['#48CAE4', '#023047'],
+    accent: '#CAF0F8',
+    brand: 'MSO',
+  },
+  {
+    id: 'mso-handball',
+    title: 'Handball',
+    date: '10 APR',
+    year: '2026',
+    time: '',
+    status: 'past',
+    category: 'SPORTS',
+    location: '',
+    description: '',
+    colors: ['#E9C46A', '#7A5A12'],
+    accent: '#FFF2CC',
+    brand: 'MSO',
+  },
+  {
+    id: 'mso-football',
+    title: 'Football with SUAMS',
+    date: '3 APR',
+    year: '2026',
+    time: '',
+    status: 'past',
+    category: 'SPORTS',
+    location: '',
+    description: '',
+    colors: ['#F72585', '#240046'],
+    accent: '#FFB3D9',
+    brand: 'MSO',
+  },
+  {
+    id: 'mso-inm',
+    title: 'International Night Market',
+    date: '1 APR',
+    year: '2026',
+    time: '',
+    status: 'past',
+    category: 'SOCIAL',
+    location: '',
+    description: '',
+    colors: ['#2B9348', '#0B3D1A'],
+    accent: '#A7E8BD',
+    brand: 'MSO',
+  },
+  {
+    id: 'mso-daytrip',
+    title: 'Day Trip',
+    date: '25 MAR',
+    year: '2026',
+    time: '',
+    status: 'past',
+    category: 'SOCIAL',
+    location: '',
+    description: '',
+    colors: ['#FF8B33', '#7A1E00'],
+    accent: '#FFD9B0',
+    brand: 'MSO',
+  },
+]
 
-export const upcomingEvents: EventType[] = galleryCards
-  .filter((c) => c.status === 'upcoming')
-  .map(toEventType)
+/* ── helpers ─────────────────────────────────────────────── */
 
-export const pastEvents: EventType[] = galleryCards
-  .filter((c) => c.status === 'past')
-  .map(toEventType)
+/** Card art: the event's own `image`, else /images/cards/<id>.png. */
+export const eventImage = (e: EventItem) => e.image || `/images/cards/${e.id}.png`
+
+/** Detail-panel image: `detailImage` if set, else the card art. */
+export const eventDetailImage = (e: EventItem) => e.detailImage || eventImage(e)
+
+/** e.g. "25 JUL 2026 · 6:00 PM – 9:00 PM" (time left off when not set). */
+export const eventWhen = (e: EventItem) =>
+  [`${e.date} ${e.year}`, e.time].filter(Boolean).join(' · ')
+
+export const upcomingEvents = events.filter((e) => e.status === 'upcoming')
+export const pastEvents = events.filter((e) => e.status === 'past')

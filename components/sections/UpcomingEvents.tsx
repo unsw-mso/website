@@ -1,15 +1,48 @@
 'use client'
 
-import { useRef } from 'react'
-import Link from 'next/link'
+import { useRef, useState } from 'react'
 import Image from 'next/image'
 import { gsap, useGSAP } from '@/lib/utils/gsap'
 import SectionLabel from '@/components/ui/SectionLabel'
-import { upcomingEvents } from '@/lib/data/events'
+import SlideOverPanel from '@/components/ui/SlideOverPanel'
+import {
+  upcomingEvents,
+  eventImage,
+  eventDetailImage,
+  eventWhen,
+  type EventItem,
+} from '@/lib/data/events'
+
+const eventGradient = (e: EventItem) =>
+  `linear-gradient(135deg, ${e.colors[0]} 0%, ${e.colors[1]} 100%)`
+
+/** Register button, shared by the card and the detail panel. External links
+    open in a new tab; hidden entirely when the event has no link yet. */
+function RegisterButton({ event }: { event: EventItem }) {
+  if (!event.registrationLink) return null
+  const external = /^https?:\/\//.test(event.registrationLink)
+  return (
+    <a
+      href={event.registrationLink}
+      {...(external ? { target: '_blank', rel: 'noopener noreferrer' } : {})}
+      // Don't also open the detail panel when clicked on a card
+      onClick={(e) => e.stopPropagation()}
+      data-cursor="hover"
+      className="inline-block rounded-pill bg-primary px-8 py-3
+                 font-heading text-[13px] font-bold uppercase
+                 tracking-widest text-white transition-transform
+                 duration-300 ease-bounce hover:scale-105
+                 active:scale-95"
+    >
+      Register →
+    </a>
+  )
+}
 
 export default function UpcomingEvents() {
   const section = useRef<HTMLElement>(null)
   const tiger = useRef<HTMLDivElement>(null)
+  const [selected, setSelected] = useState<EventItem | null>(null)
 
   useGSAP(
     () => {
@@ -67,8 +100,8 @@ export default function UpcomingEvents() {
               />
             </div>
             <p className="mt-5 max-w-[280px] text-sm leading-relaxed text-text-muted">
-              {upcomingEvents.length} event{upcomingEvents.length === 1 ? '' : 's'} this
-              term. He&apos;s excited about all of them.
+              {upcomingEvents.length} event{upcomingEvents.length === 1 ? '' : 's '} this
+              term. Harimeow&apos;s excited about all of them.
             </p>
           </div>
 
@@ -79,35 +112,34 @@ export default function UpcomingEvents() {
                 key={event.id}
                 data-event-row
                 data-cursor="hover"
-                className="group grid overflow-hidden rounded-lg border border-line
+                role="button"
+                tabIndex={0}
+                aria-label={`${event.title} — view details`}
+                onClick={() => setSelected(event)}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault()
+                    setSelected(event)
+                  }
+                }}
+                className="group grid cursor-pointer overflow-hidden rounded-lg border border-line
                            border-l-[3px] border-l-primary bg-surface
                            transition-all duration-300 ease-bounce
                            hover:-translate-y-1 hover:shadow-glow
                            md:grid-cols-[280px_1fr]"
               >
-                <div className="relative min-h-[200px] overflow-hidden">
-                  {event.imageUrl ? (
-                    <Image
-                      src={event.imageUrl}
-                      alt={event.title}
-                      fill
-                      sizes="(max-width: 768px) 100vw, 280px"
-                      className="object-cover transition-transform duration-500
-                                 ease-soft group-hover:scale-105"
-                    />
-                  ) : (
-                    <div
-                      className="flex h-full w-full items-center justify-center"
-                      style={{
-                        background:
-                          'linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 65%, var(--surface-2) 100%)',
-                      }}
-                    >
-                      <span className="font-heading text-7xl font-bold text-white/25">
-                        {event.title.charAt(0)}
-                      </span>
-                    </div>
-                  )}
+                <div
+                  className="relative min-h-[200px] overflow-hidden"
+                  style={{ background: eventGradient(event) }}
+                >
+                  <Image
+                    src={eventImage(event)}
+                    alt={event.title}
+                    fill
+                    sizes="(max-width: 768px) 100vw, 280px"
+                    className="object-cover transition-transform duration-500
+                               ease-soft group-hover:scale-105"
+                  />
                 </div>
 
                 <div className="flex flex-col gap-3.5 p-8 md:p-9">
@@ -117,23 +149,19 @@ export default function UpcomingEvents() {
                   </h3>
                   <span className="font-heading text-[13px] uppercase
                                    tracking-widest text-primary">
-                    {event.date} · {event.location}
+                    {[eventWhen(event), event.location].filter(Boolean).join(' · ')}
                   </span>
-                  <p className="leading-relaxed text-text-60">
-                    {event.description}
-                  </p>
-                  <div className="mt-2">
-                    <Link
-                      href={event.registrationLink ?? '#'}
-                      data-cursor="hover"
-                      className="inline-block rounded-pill bg-primary px-8 py-3
-                                 font-heading text-[13px] font-bold uppercase
-                                 tracking-widest text-white transition-transform
-                                 duration-300 ease-bounce hover:scale-105
-                                 active:scale-95"
-                    >
-                      Register →
-                    </Link>
+                  {event.description && (
+                    <p className="line-clamp-3 leading-relaxed text-text-60">
+                      {event.description}
+                    </p>
+                  )}
+                  <div className="mt-2 flex flex-wrap items-center gap-5">
+                    <RegisterButton event={event} />
+                    <span className="font-heading text-[12px] uppercase tracking-widest
+                                     text-text-muted transition-colors group-hover:text-primary">
+                      Details +
+                    </span>
                   </div>
                 </div>
               </article>
@@ -141,6 +169,19 @@ export default function UpcomingEvents() {
           </div>
         </div>
       </div>
+
+      {selected && (
+        <SlideOverPanel
+          onClose={() => setSelected(null)}
+          eyebrow={selected.category}
+          title={selected.title}
+          meta={[eventWhen(selected), selected.location].filter(Boolean).join(' · ')}
+          imageSrc={eventDetailImage(selected)}
+          imageBg={eventGradient(selected)}
+          description={selected.description || undefined}
+          footer={selected.registrationLink ? <RegisterButton event={selected} /> : undefined}
+        />
+      )}
     </section>
   )
 }

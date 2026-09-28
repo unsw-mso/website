@@ -4,13 +4,13 @@ import { useEffect, useRef, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import * as THREE from 'three'
 import { gsap } from '@/lib/utils/gsap'
-import { galleryCards, type GalleryCard } from './galleryData'
+import { events, eventImage, eventDetailImage, eventWhen, type EventItem } from '@/lib/data/events'
 
 // The archive shows PAST events only. Flip an event's `status` to 'upcoming'
-// in galleryData to pull it out of the sphere. (Falls back to all events if
+// in lib/data/events.ts to pull it out of the sphere. (Falls back to all events if
 // none are marked past, so the sphere is never empty.)
-const pastCards = galleryCards.filter((c) => c.status === 'past')
-const archiveCards = pastCards.length > 0 ? pastCards : galleryCards
+const pastCards = events.filter((c) => c.status === 'past')
+const archiveCards = pastCards.length > 0 ? pastCards : events
 
 /* ────────────────────────────────────────────────────────────────────────
    Sphere / grid tuning. We tile cards onto the INSIDE of a sphere and put
@@ -40,10 +40,9 @@ const DRIFT = 0.00035 // gentle idle auto-rotation
 const PITCH_UP = 0.4 // max tilt looking up
 const PITCH_DOWN = -0.4 // max tilt looking down (into the floor)
 
-/* Per-card art lives in this folder as <card-id>.png (e.g. merdeka-gala.png).
-   Any card without its own file falls back to CARD_PLACEHOLDER, then to the
-   gradient. Override a single card by setting its `image` in galleryData. */
-const CARD_IMAGE_DIR = '/images/cards'
+/* Per-card art is resolved by eventImage() in lib/data/events.ts
+   (/images/cards/<id>.png unless the event sets `image`). Any card whose file
+   fails to load falls back to CARD_PLACEHOLDER, then to the gradient. */
 const CARD_PLACEHOLDER = '/images/card-placeholder.png'
 
 /* ── Procedural card texture ─────────────────────────────────────────────
@@ -56,7 +55,7 @@ const CARD_CANVAS_H = 1040
 
 function drawCardFace(
   ctx: CanvasRenderingContext2D,
-  card: GalleryCard,
+  card: EventItem,
   img?: HTMLImageElement,
 ) {
   const W = CARD_CANVAS_W
@@ -208,7 +207,7 @@ function drawCardFace(
 }
 
 interface Selected {
-  card: GalleryCard
+  card: EventItem
 }
 
 export default function SphereGallery() {
@@ -264,7 +263,7 @@ export default function SphereGallery() {
       // Per-card art: each card looks for its own file at /images/cards/<id>.png
       // (override with an explicit `image`). If that's missing we fall back to
       // the shared placeholder, and if THAT is missing the gradient stays.
-      const primary = card.image ?? `${CARD_IMAGE_DIR}/${card.id}.png`
+      const primary = eventImage(card)
       const img = new Image()
       loadedImages.push(img)
       let triedFallback = false
@@ -451,7 +450,7 @@ export default function SphereGallery() {
         })
       })
 
-      setSelected({ card: mesh.userData.card as GalleryCard })
+      setSelected({ card: mesh.userData.card as EventItem })
     }
 
     const closeDetail = () => {
@@ -615,7 +614,7 @@ export default function SphereGallery() {
 }
 
 /* ── the basic detail "page" that flies in over the gallery ── */
-function DetailPanel({ card, onClose }: { card: GalleryCard; onClose: () => void }) {
+function DetailPanel({ card, onClose }: { card: EventItem; onClose: () => void }) {
   const ref = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
@@ -648,7 +647,7 @@ function DetailPanel({ card, onClose }: { card: GalleryCard; onClose: () => void
 
   // Detail hero image is independent of the card face: use `detailImage` if set,
   // otherwise the card's own art, otherwise the /images/cards/<id>.png fallback.
-  const heroSrc = card.detailImage ?? card.image ?? `${CARD_IMAGE_DIR}/${card.id}.png`
+  const heroSrc = eventDetailImage(card)
 
   return (
     <div
@@ -687,7 +686,7 @@ function DetailPanel({ card, onClose }: { card: GalleryCard; onClose: () => void
         data-detail-item
         className="mt-3 font-heading text-[13px] uppercase tracking-[0.2em] text-text-muted"
       >
-        {card.date} · {card.year}
+        {eventWhen(card)}
       </p>
 
       {/* eslint-disable-next-line @next/next/no-img-element */}

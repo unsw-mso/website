@@ -60,7 +60,7 @@ export default function SponsorsGrid() {
           imageFit="contain"
           imageBg={SPONSOR_BG}
           description={
-            selected.blurb ??
+            selected.description ||
             `${selected.name} proudly supports UNSW MSO, helping us run the events and community that make Malaysia feel a little closer to home.`
           }
           footer={

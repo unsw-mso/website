@@ -8,14 +8,14 @@ import FlexCarousel, {
   type FlexCarouselControl,
   type FlexCarouselItem,
 } from '@/components/ui/FlexCarousel'
-import { pastEvents } from '@/lib/data/events'
+import { pastEvents, eventImage } from '@/lib/data/events'
 
-// pastEvents is already newest-first (derived from galleryData's order)
+// pastEvents keeps lib/data/events.ts order, which is newest-first
 const RECENT: FlexCarouselItem[] = pastEvents.slice(0, 10).map((event) => ({
-  src: event.imageUrl,
+  src: eventImage(event),
   alt: event.title,
   title: event.title,
-  subtitle: event.date,
+  subtitle: `${event.date} ${event.year}`,
 }))
 
 // Viewport-heights of scroll spent on each card while pinned

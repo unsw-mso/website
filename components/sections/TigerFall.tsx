@@ -19,9 +19,12 @@ export default function TigerFall() {
          tiger drops down its track, so it reads as falling while you
          scroll past.
 
-         start 'top 80%' / end 'bottom 20%' = the fall runs while the
-         section is comfortably on screen. scrub ties progress to scroll
-         position (scrolling back up rewinds it).
+         start 'top 80%' = begins as the section comes into view.
+         end 'bottom bottom' = finishes when the section's bottom reaches
+         the bottom of the viewport, so the tiger ends its fall low on the
+         screen (rather than up near the top, which is where it landed
+         when the fall ran on until the section had mostly scrolled away).
+         scrub ties progress to scroll position (scrolling back up rewinds).
 
          The fall distance is the track height minus the tiger's own
          height (a function so it re-measures on every refresh / resize),
@@ -31,7 +34,7 @@ export default function TigerFall() {
         scrollTrigger: {
           trigger: section.current,
           start: 'top 80%',
-          end: 'bottom 20%',
+          end: 'bottom bottom',
           scrub: 1.4,
         },
       })

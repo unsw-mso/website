@@ -3,13 +3,13 @@
 import { useRef } from 'react'
 import Image from 'next/image'
 import { gsap, ScrollTrigger, useGSAP } from '@/lib/utils/gsap'
+import { emitGridPulse } from '@/components/ui/CursorGrid'
 
 export default function HeroSection() {
   const section = useRef<HTMLElement>(null)
   const photo = useRef<HTMLDivElement>(null)
   const titleA = useRef<HTMLDivElement>(null)   // MALAYSIAN STUDENTS ORGANISATION
   const titleB = useRef<HTMLDivElement>(null)   // UNSW MSO
-  const reveal = useRef<HTMLDivElement>(null)   // circular wipe into the page
 
   useGSAP(
     () => {
@@ -58,9 +58,9 @@ export default function HeroSection() {
         scrollTrigger: {
           trigger: section.current,
           start: 'top top',
-          // Extra scroll room: the first ~half zooms the photo out, the
-          // second ~half grows the circular wipe into the rest of the page.
-          end: '+=185%',
+          // One extra viewport of scroll to zoom the photo out onto the
+          // CursorGrid backdrop before the page carries on.
+          end: '+=100%',
           pin: true,
           scrub: 1.2,
           // Prevents a 1px gap appearing under the pinned section in
@@ -83,11 +83,6 @@ export default function HeroSection() {
           { opacity: 1, y: 0, ease: 'none', duration: 0.5 },
           0.3,
         )
-        // Circular wipe (same idea as the events-archive portal, but scroll-
-        // driven and in the page's own bg colour): a bg-bg disc grows from the
-        // centre until it swallows the hero, handing off seamlessly to the rest
-        // of the home page which shares that background.
-        .to(reveal.current, { scale: 1, ease: 'power1.in', duration: 0.9 }, 0.95)
 
       /* ==========================================================
          PART 3 — REFRESH AFTER THE PHOTO LOADS
@@ -101,7 +96,52 @@ export default function HeroSection() {
          ========================================================== */
       const onLoad = () => ScrollTrigger.refresh()
       window.addEventListener('load', onLoad)
-      return () => window.removeEventListener('load', onLoad)
+
+      /* ==========================================================
+         PART 4 — AMBIENT RIPPLES ONCE ZOOMED OUT
+         ==========================================================
+         While the hero is pinned and the photo has mostly shrunk, fire
+         a ripple on the site-wide CursorGrid every couple of seconds,
+         from a random point in the margin the shrunken photo leaves
+         (scale 0.75 → ~12.5% band on each side). */
+      const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+      const st = scrollTl.scrollTrigger
+      const zoomedOut = () => !!st?.isActive && st.progress > 0.8 && !document.hidden
+
+      const ripple = () => {
+        const w = window.innerWidth
+        const h = window.innerHeight
+        const band = 0.125
+        const along = Math.random()
+        const into = Math.random() * band
+        switch (Math.floor(Math.random() * 4)) {
+          case 0: return emitGridPulse(into * w, along * h)             // left
+          case 1: return emitGridPulse((1 - into) * w, along * h)       // right
+          case 2: return emitGridPulse(along * w, into * h)             // top
+          default: return emitGridPulse(along * w, (1 - into) * h)      // bottom
+        }
+      }
+
+      let wasZoomedOut = false
+      const check = () => {
+        const now = zoomedOut()
+        // Fire straight away on arrival so it doesn't feel delayed
+        if (now && !wasZoomedOut) ripple()
+        wasZoomedOut = now
+      }
+      let interval: number | undefined
+      if (!reduceMotion) {
+        interval = window.setInterval(() => {
+          if (zoomedOut()) ripple()
+        }, 2200)
+        window.addEventListener('scroll', check, { passive: true })
+      }
+
+      return () => {
+        window.removeEventListener('load', onLoad)
+        window.removeEventListener('scroll', check)
+        if (interval) window.clearInterval(interval)
+      }
     },
     { scope: section },
   )
@@ -111,16 +151,10 @@ export default function HeroSection() {
   return (
     <section
       ref={section}
-      className="relative h-screen w-full overflow-hidden bg-bg"
+      // Transparent on purpose: the page-wide CursorGrid backdrop (mounted in
+      // app/page.tsx) shows in the margins once the photo zooms out.
+      className="relative h-screen w-full overflow-hidden"
     >
-      {/* Wavy backdrop revealed as the photo zooms out. Sits behind the photo
-          in DOM order so it only shows in the margins once the photo shrinks. */}
-      <div
-        aria-hidden
-        className="absolute inset-0 bg-[#E0702E] bg-cover bg-center"
-        style={{ backgroundImage: "url('/images/orange-backdrop.png')" }}
-      />
-
       {/* Photo wrapper is what GSAP scales — never the <Image> itself,
           because next/image manages its own inline styles. */}
       <div ref={photo} className="absolute inset-0 overflow-hidden">
@@ -183,17 +217,6 @@ export default function HeroSection() {
           MSO
         </h2>
       </div>
-
-      {/* Circular wipe disc — the page's own bg colour (cream in light mode,
-          near-black in dark). Starts collapsed; the scroll timeline grows it to
-          cover the hero and blend into the sections below. Last child = on top. */}
-      <div
-        ref={reveal}
-        aria-hidden
-        className="pointer-events-none absolute left-1/2 top-1/2 aspect-square
-                   w-[160vmax] -translate-x-1/2 -translate-y-1/2 scale-0
-                   rounded-full bg-bg"
-      />
     </section>
   )
 }

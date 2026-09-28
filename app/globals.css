@@ -1,10 +1,5 @@
 @import "tailwindcss";
 
-/* Teach Tailwind about our theme attribute so `dark:` style variants work.
-   Usage: <div className="light:text-black"> */
-@custom-variant light (&:where([data-theme="light"], [data-theme="light"] *));
-
-
 :root {
   --primary:       #FF6B00;
   --primary-dark:  #CC5500;
@@ -14,10 +9,7 @@
 
   --ease-bounce: cubic-bezier(0.34, 1.56, 0.64, 1);
   --ease-soft:   cubic-bezier(0.22, 1, 0.36, 1);
-}
 
-:root,
-[data-theme='dark'] {
   --bg:          #0A0A0A;
   --surface:     #141414;
   --surface-2:   #1C1C1C;
@@ -28,22 +20,10 @@
   --shadow-soft: 0 24px 60px rgba(0, 0, 0, 0.55);
 }
 
-[data-theme='light'] {
-  --bg:          #F5F0E8;
-  --surface:     #FFFFFF;
-  --surface-2:   #EDE6D9;
-  --text:        #0A0A0A;
-  --text-60:     rgba(10, 10, 10, 0.60);
-  --text-muted:  rgba(10, 10, 10, 0.45);
-  --line:        rgba(10, 10, 10, 0.08);
-  --shadow-soft: 0 24px 60px rgba(120, 100, 70, 0.18);
-}
-
 /* ============================================================
    TAILWIND THEME — generates the utility classes.
-   `inline` is ESSENTIAL here: it makes `bg-bg` compile to
-   `background-color: var(--bg)` rather than baking in #0A0A0A
-   at build time. Without it, theme switching silently does nothing.
+   `inline` makes `bg-bg` compile to `background-color: var(--bg)`
+   so the palette stays defined in one place (the :root block above).
    ============================================================ */
 @theme inline {
   --color-bg:          var(--bg);

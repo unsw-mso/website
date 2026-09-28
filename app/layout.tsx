@@ -6,9 +6,9 @@ import 'lenis/dist/lenis.css'
 
 import LenisProvider from '@/providers/LenisProvider'
 import CustomCursor from '@/components/ui/CustomCursor'
-import ThemeFlap from '@/components/ui/ThemeFlap'
 import Navbar from '@/components/layout/Navbar'
 import Footer from '@/components/layout/Footer'
+import CursorGrid from '@/components/ui/CursorGrid'
 
 const spaceGrotesk = Space_Grotesk({
   subsets: ['latin'],
@@ -55,17 +55,6 @@ export const metadata: Metadata = {
   twitter: { card: 'summary_large_image' },
 }
 
-// Runs BEFORE first paint so a light-mode user never sees a black flash
-const noFlashScript = `
-(function(){
-  try {
-    var t = localStorage.getItem('mso-theme') || 'dark';
-    document.documentElement.setAttribute('data-theme', t);
-  } catch(e) {
-    document.documentElement.setAttribute('data-theme','dark');
-  }
-})();`
-
 export default function RootLayout({
   children,
 }: {
@@ -74,20 +63,37 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      data-theme="dark"
       className={`${spaceGrotesk.variable} ${inter.variable}`}
-      suppressHydrationWarning
     >
-      <head>
-        <script dangerouslySetInnerHTML={{ __html: noFlashScript }} />
-      </head>
       <body className="font-body antialiased">
+          {/* Site-wide backdrop. Lives here (not in a page) so it sits outside
+              template.tsx's transformed wrapper, which would trap `fixed`.
+              -z-10 still paints above the body background; it listens on
+              window because page content covers it. */}
+          <div aria-hidden className="pointer-events-none fixed inset-0 -z-10">
+            <CursorGrid
+              cellSize={55}
+              color="#F97316"
+              radius={140}
+              falloff="smooth"
+              holdTime={100}
+              fadeDuration={400}
+              lineWidth={1.2}
+              maxOpacity={1}
+              fillOpacity={0}
+              gridOpacity={0.05}
+              cellRadius={0}
+              clickPulse
+              pulseSpeed={450}
+              listenOnWindow
+              hoverGlow={false}
+            />
+          </div>
           <LenisProvider>
             <CustomCursor />
             <Navbar />
             {children}
             <Footer />
-            <ThemeFlap />
           </LenisProvider>
           <Analytics />
       </body>

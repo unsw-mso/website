@@ -8,11 +8,11 @@ export default function SponsorsStrip() {
   const logos = sponsors.map((s) => (
     <div
       key={s.id}
-      className="mx-10 flex h-14 w-40 items-center justify-center
+      className="mx-10 flex h-14 min-w-40 items-center px-6 justify-center
                  rounded-md border border-line bg-surface
                  transition-colors duration-300 hover:border-primary"
     >
-      <span className="font-heading text-[11px] uppercase
+      <span className="whitespace-nowrap font-heading text-[11px] uppercase
                        tracking-[0.18em] text-text-muted">
         {s.name}
       </span>

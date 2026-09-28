@@ -10,43 +10,41 @@ import AnimatedText from '@/components/ui/AnimatedText'
 export default function TigerFall() {
   const section = useRef<HTMLElement>(null)
   const tiger = useRef<HTMLDivElement>(null)
+  const track = useRef<HTMLDivElement>(null)
 
   useGSAP(
     () => {
-      /* PINNED FALL — the section sticks to the viewport while the tiger
-         falls down the screen, so it "follows the view" instead of
-         scrolling past. Same pinning mechanism as the hero
-         (HeroSection.tsx) and the merch video hero.
+      /* SCROLL-SCRUBBED FALL — no pinning, the page keeps scrolling
+         normally. As the section travels up through the viewport the
+         tiger drops down its track, so it reads as falling while you
+         scroll past.
 
-         start 'top top' = pin once the section's top reaches the top of
-         the viewport. end '+=150%' = hold the pin for 1.5 extra viewport
-         heights of scrolling; raise it for a slower / longer fall, lower
-         it for a quicker one. anticipatePin avoids a subpixel gap under
-         the pinned section on some browsers.
+         start 'top 80%' / end 'bottom 20%' = the fall runs while the
+         section is comfortably on screen. scrub ties progress to scroll
+         position (scrolling back up rewinds it).
 
-         The fall distance is driven in VIEWPORT-relative pixels (a
-         function so it re-measures on every ScrollTrigger refresh /
-         resize) rather than yPercent, so the enlarged tiger always
-         traverses the full screen height regardless of its own size. */
+         The fall distance is the track height minus the tiger's own
+         height (a function so it re-measures on every refresh / resize),
+         so the tiger lands at the bottom of its track instead of being
+         clipped by the section's overflow-hidden. */
       const tl = gsap.timeline({
         scrollTrigger: {
           trigger: section.current,
-          start: 'top top',
-          end: '+=150%',
-          pin: true,
+          start: 'top 80%',
+          end: 'bottom 20%',
           scrub: 1.4,
-          anticipatePin: 1,
         },
       })
 
-      // How far down the screen the tiger travels (top → near bottom).
-      const fall = () => window.innerHeight * 0.72
+      // How far the tiger travels from the top of its track to the bottom.
+      const fall = () =>
+        Math.max(0, (track.current?.offsetHeight ?? 0) - (tiger.current?.offsetHeight ?? 0))
 
       tl
         // Position 1 → 2: falls to mid-height, tumbling clockwise
         .fromTo(
           tiger.current,
-          { y: () => -fall() * 0.12, rotate: -14, xPercent: 0 },
+          { y: 0, rotate: -14, xPercent: 0 },
           { y: () => fall() * 0.5, rotate: 12, xPercent: -18, ease: 'none' },
         )
         // Position 2 → 3: continues to the bottom, rotation eases back
@@ -85,10 +83,9 @@ export default function TigerFall() {
           </AnimatedText>
         </div>
 
-        {/* Full-height track the tiger falls through. While the section is
-            pinned this spans the viewport, giving the absolutely-positioned
-            tiger the room it needs to fall the whole screen height. */}
-        <div className="relative min-h-[70vh] md:min-h-screen">
+        {/* Full-height track the tiger falls through, giving the
+            absolutely-positioned tiger room to drop as the page scrolls. */}
+        <div ref={track} className="relative min-h-[70vh] md:min-h-screen">
           <div
             ref={tiger}
             className="absolute right-[8%] top-0 w-[320px] md:w-[440px]"

@@ -46,15 +46,17 @@ export default function Navbar() {
                            tracking-[0.28em] text-text-muted">UNSW</span>
         </Link>
 
-        <nav className="hidden items-center gap-9 md:flex">
+        <nav className="hidden items-center gap-2.5 md:flex">
           {LINKS.map((l) => (
             <Link
               key={l.href}
               href={l.href}
               data-cursor="hover"
-              className={`font-heading text-[13px] uppercase tracking-[0.14em]
-                          transition-colors duration-200 hover:text-primary
-                          ${pathname === l.href ? 'text-primary' : 'text-text'}`}
+              className={`rounded-pill border px-5 py-2 font-heading text-[13px]
+                          uppercase tracking-[0.14em] transition-colors duration-200
+                          ${pathname === l.href
+                            ? 'border-primary text-primary'
+                            : 'border-text/25 text-text hover:border-primary hover:text-primary'}`}
             >
               {l.label}
             </Link>

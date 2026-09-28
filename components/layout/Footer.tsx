@@ -1,6 +1,3 @@
-import Link from 'next/link'
-
-const NAV = ['Home', 'Events', 'Committee', 'Merch', 'Sponsors']
 const SOCIAL = [
   { label: 'Instagram', href: 'https://www.instagram.com/unswmso' },
   { label: 'Whatsapp', href: 'https://chat.whatsapp.com/G6skQanwkYY2ukBCq7DpJL' },
@@ -31,21 +28,7 @@ export default function Footer() {
             </span>
           </div>
 
-          <nav className="flex flex-wrap gap-x-8 gap-y-3">
-            {NAV.map((l) => (
-              <Link
-                key={l}
-                href={l === 'Home' ? '/' : `/${l.toLowerCase()}`}
-                data-cursor="hover"
-                className="font-heading text-[13px] uppercase tracking-[0.12em]
-                           text-text-60 transition-colors hover:text-primary"
-              >
-                {l}
-              </Link>
-            ))}
-          </nav>
-
-          <div className="flex flex-wrap gap-5">
+          <div className="flex flex-wrap gap-2.5">
             {SOCIAL.map((s) => (
               <a
                 key={s.label}
@@ -53,8 +36,10 @@ export default function Footer() {
                 target="_blank"
                 rel="noopener noreferrer"
                 data-cursor="hover"
-                className="font-heading text-[13px] uppercase tracking-[0.12em]
-                           text-text-60 transition-colors hover:text-primary"
+                // Same pill style as the navbar links
+                className="rounded-pill border border-text/25 px-5 py-2 font-heading
+                           text-[13px] uppercase tracking-[0.12em] text-text-60
+                           transition-colors hover:border-primary hover:text-primary"
               >
                 {s.label}
               </a>

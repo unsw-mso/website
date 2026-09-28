@@ -60,7 +60,7 @@ export const committee: CommitteeMember[] = [
   { id: 'c26',  name: 'Lim Jing Ren',   role: 'Subcommittee', department: 'IT', imageUrl: '/images/committee/jr.webp' },
   { id: 'c27',  name: 'Sri Azlan',   role: 'Subcommittee', department: 'IT', imageUrl: '/images/committee/sri.webp' },
 
-  { id: 'c28',  name: 'Theeran',   role: 'Director', department: 'Creatives', imageUrl: '' },
+  { id: 'c28',  name: 'Theeran',   role: 'Director', department: 'Creatives', imageUrl: '/images/committee/theeran.webp' },
   { id: 'c29',  name: 'Xin Hui',   role: 'Subcommittee', department: 'Creatives', imageUrl: '/images/committee/xinhui.webp' },
   { id: 'c30',  name: 'Xin Qi',   role: 'Subcommittee', department: 'Creatives', imageUrl: '/images/committee/xinqi.webp' },
   { id: 'c31',  name: 'Aiman Firdaus',   role: 'Subcommittee', department: 'Creatives', imageUrl: '/images/committee/aiman.webp' },
@@ -68,7 +68,7 @@ export const committee: CommitteeMember[] = [
   { id: 'c32',  name: 'Aidan Chew',   role: 'Director', department: 'Marketing', imageUrl: '/images/committee/aidanchew.webp' },
   { id: 'c33',  name: 'Bryan Bong',   role: 'Director', department: 'Marketing', imageUrl: '/images/committee/bryan.webp' },
   { id: 'c34',  name: 'Juvene Chang',   role: 'Subcommittee', department: 'Marketing', imageUrl: '/images/committee/juvene.webp' },
-  { id: 'c35',  name: 'Jonas Cheng',   role: 'Subcommittee', department: 'Marketing', imageUrl: '' },
+  { id: 'c35',  name: 'Jonas Cheng',   role: 'Subcommittee', department: 'Marketing', imageUrl: '/images/committee/jonas.webp' },
 
   { id: 'c36',  name: 'Qiao Yi Tan',   role: 'Director', department: 'Treasurer', imageUrl: '/images/committee/qiaoyi.webp' },
   { id: 'c37',  name: 'Calvin Gooi',   role: 'Subcommittee', department: 'Treasurer', imageUrl: '/images/committee/calvin.webp' },

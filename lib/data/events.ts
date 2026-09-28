@@ -53,7 +53,7 @@ export interface EventItem {
 export const events: EventItem[] = [
    {
     id: 'TESTTTTT',
-    title: 'Volleyball',
+    title: 'TEsTtTT',
     date: '25 JUL',
     year: '2026',
     time: '',

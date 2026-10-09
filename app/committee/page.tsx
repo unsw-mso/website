@@ -1,7 +1,6 @@
 import type { Metadata } from 'next'
 import PageHero from '@/components/layout/PageHero'
-import PresidentFeature from '@/components/sections/PresidentFeature'
-import CommitteeGrid from '@/components/sections/CommitteeGrid'
+import CommitteeTenures from '@/components/sections/CommitteeTenures'
 import TigerCameo from '@/components/sections/TigerCameo'
 
 export const metadata: Metadata = {
@@ -17,8 +16,7 @@ export default function CommitteePage() {
         subtitle="The people behind MSO 2026"
         texture="grid"
       />
-      <PresidentFeature />
-      <CommitteeGrid />
+      <CommitteeTenures />
       <TigerCameo />
     </main>
   )

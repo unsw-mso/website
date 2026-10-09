@@ -4,9 +4,10 @@ import { useRef } from 'react'
 import { gsap, useGSAP } from '@/lib/utils/gsap'
 import TeamCard from '@/components/cards/TeamCard'
 import { useMemberSpotlight } from '@/components/sections/useMemberSpotlight'
-import { generalCommittee, DEPARTMENTS } from '@/lib/data/committee'
+import { DEPARTMENTS, type CommitteeMember } from '@/lib/data/committee'
 
-export default function CommitteeGrid() {
+/** Everyone except the TopExecutive, grouped by department. */
+export default function CommitteeGrid({ members: committee }: { members: CommitteeMember[] }) {
   const section = useRef<HTMLElement>(null)
   const { open: openMember, spotlight } = useMemberSpotlight()
 
@@ -38,7 +39,7 @@ export default function CommitteeGrid() {
     <section ref={section} className="px-6 pb-40 md:px-12">
       <div className="mx-auto flex max-w-[1440px] flex-col gap-20">
         {depts.map((dept) => {
-          const members = generalCommittee.filter((m) => m.department === dept)
+          const members = committee.filter((m) => m.department === dept)
           if (!members.length) return null
 
           return (

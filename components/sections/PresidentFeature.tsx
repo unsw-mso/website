@@ -4,9 +4,9 @@ import { useRef } from 'react'
 import Image from 'next/image'
 import { gsap, useGSAP } from '@/lib/utils/gsap'
 import { useMemberSpotlight } from '@/components/sections/useMemberSpotlight'
-import { executives } from '@/lib/data/committee'
+import type { CommitteeMember } from '@/lib/data/committee'
 
-export default function PresidentFeature() {
+export default function PresidentFeature({ executives }: { executives: CommitteeMember[] }) {
   const section = useRef<HTMLElement>(null)
   const { open: openMember, spotlight } = useMemberSpotlight()
 

@@ -91,6 +91,7 @@ export default function CommitteeTenures() {
           Also opens the panel on click/tap (touch + keyboard). */}
       <button
         ref={tab}
+        data-no-ripple
         type="button"
         onClick={() => setOpen(true)}
         aria-expanded={open}
@@ -112,6 +113,8 @@ export default function CommitteeTenures() {
           year with the keyboard also opens it. */}
       <div
         ref={panel}
+        // Picking a year shouldn't set off the background grid's click ripple
+        data-no-ripple
         role="region"
         aria-label="Committee tenure"
         onFocus={() => setOpen(true)}
@@ -138,8 +141,8 @@ export default function CommitteeTenures() {
             markerColor="#6c6c6c"
             showIndex
             showMarker
-            proximityRadius={100}
-            maxShift={30}
+            proximityRadius={29}
+            maxShift={28}
             falloff="smooth"
             markerLength={60}
             markerGap={0}

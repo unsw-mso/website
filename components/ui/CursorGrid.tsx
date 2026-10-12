@@ -302,6 +302,8 @@ const CursorGrid = ({
 
     const onPointerDown = (e: PointerEvent) => {
       if (!propsRef.current.clickPulse) return;
+      // Opt-out: clicks inside any [data-no-ripple] element don't pulse
+      if ((e.target as Element | null)?.closest?.('[data-no-ripple]')) return;
       addPulse(e.clientX, e.clientY);
     };
 

@@ -43,9 +43,10 @@ export default function SponsorsGrid() {
       {/* Every sponsor gets identical treatment */}
       <div className="mx-auto grid max-w-[1440px] gap-6 sm:grid-cols-2
                       lg:grid-cols-3 xl:grid-cols-4">
-        {sponsors.map((sponsor) => (
+        {sponsors.map((sponsor, i) => (
           <div key={sponsor.id} data-sponsor>
-            <SponsorCard sponsor={sponsor} onSelect={setSelected} />
+            {/* First row (4 at the widest layout) is on screen at load */}
+            <SponsorCard sponsor={sponsor} onSelect={setSelected} eager={i < 4} />
           </div>
         ))}
       </div>
@@ -53,7 +54,7 @@ export default function SponsorsGrid() {
       {selected && (
         <SlideOverPanel
           onClose={() => setSelected(null)}
-          eyebrow={selected.tier ?? 'Partner'}
+          eyebrow="Partner"
           title={selected.name}
           meta={domainOf(selected.website)}
           imageSrc={selected.logoUrl || undefined}

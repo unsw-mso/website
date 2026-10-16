@@ -49,6 +49,8 @@ export default function PresidentFeature({ executives }: { executives: Committee
                 alt={exec.name}
                 fill
                 sizes="(max-width: 768px) 100vw, 50vw"
+                // First big images on /committee, so don't lazy-load them
+                loading="eager"
                 className="object-cover transition-transform duration-700
                            ease-soft group-hover:scale-105"
               />

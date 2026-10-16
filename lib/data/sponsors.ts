@@ -8,8 +8,6 @@
  *   logoUrl     image path under /public ('' → name shown as a wordmark)
  *   description text shown in the panel when the sponsor is clicked
  *   website     optional URL; adds a "Visit website" button to the panel
- *   tier        optional pill above the panel title, e.g. 'Gold Partner'
- *               (defaults to 'Partner')
  */
 export interface Sponsor {
   id: string
@@ -17,44 +15,55 @@ export interface Sponsor {
   logoUrl: string
   description?: string
   website?: string
-  tier?: string
 }
 
 export const sponsors: Sponsor[] = [
   {
     id: 's1',
     name: 'Kao Kao',
-    logoUrl: '/images/sponsors/kaokao.png',
+    logoUrl: '/images/sponsors/kaokao.webp',
     description:
       'Kao Kao proudly supports UNSW MSO, helping us run the events and community that make Malaysia feel a little closer to home.',
     // website: 'https://…',
-    // tier: 'Gold Partner',
   },
   {
     id: 's2',
     name: 'Dynasty Karaoke',
-    logoUrl: '/images/sponsors/dynastykar.png',
+    logoUrl: '/images/sponsors/dynastykar.webp',
     description:
       'Dynasty Karaoke proudly supports UNSW MSO, helping us run the events and community that make Malaysia feel a little closer to home.',
     // website: 'https://…',
-    // tier: 'Gold Partner',
   },
   {
     id: 's3',
     name: 'Future Spects Pty Ltd',
-    logoUrl: '/images/sponsors/keku.png',
+    logoUrl: '/images/sponsors/keku.webp',
     description:
       'Future Spects Pty Ltd proudly supports UNSW MSO, helping us run the events and community that make Malaysia feel a little closer to home.',
     // website: 'https://…',
-    // tier: 'Gold Partner',
   },
   {
     id: 's4',
     name: 'Tiger Pocha',
-    logoUrl: '/images/sponsors/tigerpocha.png',
+    logoUrl: '/images/sponsors/tigerpocha.webp',
     description:
       'Tiger Pocha proudly supports UNSW MSO, helping us run the events and community that make Malaysia feel a little closer to home.',
     // website: 'https://…',
-    // tier: 'Gold Partner',
+  },
+  {
+    id: 's5',
+    name: 'Education Malaysia Australia',
+    logoUrl: '/images/sponsors/ema.webp',
+    description:
+      'Education Malaysia Australia proudly supports UNSW MSO, helping us run the events and community that make Malaysia feel a little closer to home.',
+    // website: 'https://…',
+  },
+  {
+    id: 's6',
+    name: 'Singapore Global Network',
+    logoUrl: '/images/sponsors/sgn.webp',
+    description:
+      'Singapore Global Network proudly supports UNSW MSO, helping us run the events and community that make Malaysia feel a little closer to home.',
+    // website: 'https://…',
   },
 ]

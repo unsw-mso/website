@@ -9,6 +9,14 @@ import { sponsors, type Sponsor } from '@/lib/data/sponsors'
 const SPONSOR_BG =
   'linear-gradient(140deg, var(--surface) 0%, var(--surface-2) 100%)'
 
+// Centred, wrapping rows; each card is one column of a 1/2/3/4-col layout
+const ROW = 'mx-auto flex max-w-[1440px] flex-wrap justify-center gap-6'
+const CELL =
+  'w-full sm:w-[calc((100%-1.5rem)/2)] lg:w-[calc((100%-3rem)/3)] xl:w-[calc((100%-4.5rem)/4)]'
+
+const featured = sponsors.filter((s) => s.featured)
+const others = sponsors.filter((s) => !s.featured)
+
 const domainOf = (url?: string) => {
   if (!url) return undefined
   try {
@@ -40,12 +48,21 @@ export default function SponsorsGrid() {
 
   return (
     <section ref={section} className="px-6 pb-36 pt-8 md:px-12">
-      {/* Every sponsor gets identical treatment */}
-      <div className="mx-auto grid max-w-[1440px] gap-6 sm:grid-cols-2
-                      lg:grid-cols-3 xl:grid-cols-4">
-        {sponsors.map((sponsor, i) => (
-          <div key={sponsor.id} data-sponsor>
-            {/* First row (4 at the widest layout) is on screen at load */}
+      {/* Featured sponsors sit on their own row above the rest */}
+      {featured.length > 0 && (
+        <div className={`${ROW} mb-6`}>
+          {featured.map((sponsor) => (
+            <div key={sponsor.id} data-sponsor className={CELL}>
+              <SponsorCard sponsor={sponsor} onSelect={setSelected} eager />
+            </div>
+          ))}
+        </div>
+      )}
+
+      <div className={ROW}>
+        {others.map((sponsor, i) => (
+          <div key={sponsor.id} data-sponsor className={CELL}>
+            {/* First row (4 at the widest layout) can be on screen at load */}
             <SponsorCard sponsor={sponsor} onSelect={setSelected} eager={i < 4} />
           </div>
         ))}

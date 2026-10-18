@@ -8,6 +8,8 @@
  *   logoUrl     image path under /public ('' → name shown as a wordmark)
  *   description text shown in the panel when the sponsor is clicked
  *   website     optional URL; adds a "Visit website" button to the panel
+ *   featured    optional; true → shown in the centred top row on the
+ *               sponsors page, above everyone else
  */
 export interface Sponsor {
   id: string
@@ -15,6 +17,7 @@ export interface Sponsor {
   logoUrl: string
   description?: string
   website?: string
+  featured?: boolean
 }
 
 export const sponsors: Sponsor[] = [
@@ -56,6 +59,7 @@ export const sponsors: Sponsor[] = [
     logoUrl: '/images/sponsors/ema.webp',
     description:
       'Education Malaysia Australia proudly supports UNSW MSO, helping us run the events and community that make Malaysia feel a little closer to home.',
+    featured: true,
     // website: 'https://…',
   },
   {
@@ -64,6 +68,7 @@ export const sponsors: Sponsor[] = [
     logoUrl: '/images/sponsors/sgn.webp',
     description:
       'Singapore Global Network proudly supports UNSW MSO, helping us run the events and community that make Malaysia feel a little closer to home.',
+    featured: true,
     // website: 'https://…',
   },
 ]

@@ -1,6 +1,13 @@
 This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
 ## Getting Started
+Welcome to MSO's website!
+
+Run
+```bash
+npm install
+```
+to install the dependencies needed.
 
 First, run the development server:
 

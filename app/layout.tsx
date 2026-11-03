@@ -5,10 +5,8 @@ import './globals.css'
 import 'lenis/dist/lenis.css'
 
 import LenisProvider from '@/providers/LenisProvider'
-import CustomCursor from '@/components/ui/CustomCursor'
 import Navbar from '@/components/layout/Navbar'
 import Footer from '@/components/layout/Footer'
-import CursorGrid from '@/components/ui/CursorGrid'
 
 const spaceGrotesk = Space_Grotesk({
   subsets: ['latin'],
@@ -32,8 +30,7 @@ export const metadata: Metadata = {
   description: 
     "Malaysia's home at UNSW. Events, community and culture for Malaysian students in Sydney.",
     
-  // Required for Open Graph images to resolve to absolute URLs
-  // !!! Swap unswmso.org for your real domain when you have it.
+
   metadataBase: new URL('https://www.unswmso.com'),
   manifest: '/site.webmanifest',
   icons: {
@@ -71,26 +68,8 @@ export default function RootLayout({
               -z-10 still paints above the body background; it listens on
               window because page content covers it. */}
           <div aria-hidden className="pointer-events-none fixed inset-0 -z-10">
-            <CursorGrid
-              cellSize={55}
-              color="#F97316"
-              radius={140}
-              falloff="smooth"
-              holdTime={100}
-              fadeDuration={400}
-              lineWidth={1.2}
-              maxOpacity={1}
-              fillOpacity={0}
-              gridOpacity={0.05}
-              cellRadius={0}
-              clickPulse
-              pulseSpeed={450}
-              listenOnWindow
-              hoverGlow={false}
-            />
           </div>
           <LenisProvider>
-            <CustomCursor />
             <Navbar />
             {children}
             <Footer />

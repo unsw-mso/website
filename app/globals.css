@@ -14,8 +14,8 @@
   --surface:     #141414;
   --surface-2:   #1C1C1C;
   --text:        #F5F0E8;
-  --text-60:     rgba(245, 240, 232, 0.60);
-  --text-muted:  rgba(245, 240, 232, 0.45);
+  --text-60:     rgba(223, 221, 220, 0.774);
+  --text-muted:  rgba(254, 251, 246, 0.38);
   --line:        rgba(245, 240, 232, 0.08);
   --shadow-soft: 0 24px 60px rgba(0, 0, 0, 0.55);
 }
@@ -69,14 +69,6 @@
     transition: background-color 0.5s var(--ease-soft),
                 color            0.5s var(--ease-soft);
     overscroll-behavior-y: none;
-  }
-
-  /* Hide the native cursor only where a real pointer exists */
-  @media (hover: hover) and (pointer: fine) {
-    body,
-    body * {
-      cursor: none !important;
-    }
   }
 
   @media (prefers-reduced-motion: reduce) {

@@ -2,8 +2,8 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
+import Image from 'next/image'
 import { usePathname } from 'next/navigation'
-import { useGSAP, ScrollTrigger } from '@/lib/utils/gsap'
 
 const LINKS = [
   { label: 'Home', href: '/' },
@@ -14,44 +14,39 @@ const LINKS = [
 ]
 
 export default function Navbar() {
-  const [scrolled, setScrolled] = useState(false)
   const [open, setOpen] = useState(false)
   const pathname = usePathname()
 
-  useGSAP(() => {
-    /* Using ScrollTrigger rather than a raw scroll listener means this
-       reads from the SAME synchronised scroll position as everything
-       else. A separate window.scrollY listener would fight Lenis and
-       fire at slightly different moments. */
-    ScrollTrigger.create({
-      start: 'top -80',            // 80px down from the very top
-      onEnter: () => setScrolled(true),
-      onLeaveBack: () => setScrolled(false),
-    })
-  }, [])
-
   return (
     <header
-      className={`fixed inset-x-0 top-0 z-[900] transition-all duration-400
-                  ${scrolled
-                    ? 'border-b border-line bg-bg/75 backdrop-blur-xl'
-                    : 'border-b border-transparent bg-transparent'}`}
-    >
-      <div className="mx-auto flex max-w-[1440px] items-center justify-between
-                      px-6 py-5 md:px-12">
-        <Link href="/" data-cursor="hover"
-              className="flex items-baseline gap-2.5">
-          <span className="font-heading text-[22px] font-bold text-text">MSO</span>
-          <span className="font-heading text-[11px] uppercase
-                           tracking-[0.28em] text-text-muted">UNSW</span>
+      className="fixed inset-x-0 top-0 z-[900] border-b border-line bg-bg">
+      <div className="mx-auto flex max-w-[1440px] min-h-[80px] items-end justify-between
+                      px-6 pt-5 pb-5 md:px-12">
+        <Link href="/" className="flex shrink-0 items-baseline gap-2">
+          <Image
+            src="/images/harimeow-nav-icon.png"
+            alt="Meow"
+            width={40}
+            height={40}
+            className="h-13 w-13 translate-y-[9px] object-contain"
+            priority
+            unoptimized
+          />
+          <div className="flex items-baseline gap-1 leading-none">
+            <span className="font-heading text-[36px] tracking-[0.0.08em] font-bold text-text">
+              MSO
+            </span>
+            <span className="font-heading text-[16px] font-bold tracking-[0.08em] text-text-60">
+              UNSW
+            </span>
+          </div>
         </Link>
 
-        <nav className="hidden items-center gap-2.5 md:flex">
+        <nav className="hidden shrink-0 items-baseline gap-2.5 md:flex">
           {LINKS.map((l) => (
             <Link
               key={l.href}
               href={l.href}
-              data-cursor="hover"
               className={`rounded-pill border px-5 py-2 font-heading text-[13px]
                           uppercase tracking-[0.14em] transition-colors duration-200
                           ${pathname === l.href
@@ -62,17 +57,6 @@ export default function Navbar() {
             </Link>
           ))}
         </nav>
-
-        <Link
-          href="https://campus.hellorubric.com/?tab=memberships&s=8420"
-          data-cursor="hover"
-          className="hidden rounded-pill bg-primary px-6 py-3 font-heading
-                     text-[13px] font-bold uppercase tracking-widest text-white
-                     transition-transform duration-300 ease-bounce
-                     hover:scale-105 active:scale-95 md:inline-block"
-        >
-          Join Us
-        </Link>
 
         <button
           onClick={() => setOpen(!open)}
